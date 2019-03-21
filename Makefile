@@ -1,5 +1,5 @@
 CC			= gcc
-SOURCES		= $(shell find $(SOURCEDIR) -maxdepth 1 -name '*.c')
+SOURCES		= $(shell find . -maxdepth 1 -name '*.c')
 OBJS		= $(SOURCES:.c=)
 CFLAGS		=
 MAKEFLAGS   = --no-print-directory
