@@ -1,11 +1,11 @@
 CC			= gcc
 SOURCES		= $(shell find $(SOURCEDIR) -maxdepth 1 -name '*.c')
-OBJS		= $(SOURCES:.c=)
+OBJS		= $(SOURCES:.c=.o)
 CFLAGS		=
 MAKEFLAGS   = --no-print-directory
 
 %.c:
-	$(CC) $(CFLAGS) $@.c -o $@.o
+	$(CC) $(CFLAGS) $@.c -o $@
 
 all:
 	@make --no-print-directory clean
