@@ -6,14 +6,8 @@
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once
 
-// get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa) {
-	if (sa->sa_family == AF_INET6) {
-        return &(((struct sockaddr_in6*)sa)->sin6_addr);  // IPv6
-	}
-
-    return &(((struct sockaddr_in*)sa)->sin_addr); // IPv4
-}
+void *get_in_addr(struct sockaddr *sa);
+void receive_message(int socket_file_descriptor);
 
 int main(int argc, char *argv[]) {
 	if (argc != 2) {
@@ -62,7 +56,26 @@ int main(int argc, char *argv[]) {
 
 	freeaddrinfo(servinfo); // all done with this structure
 
-    int numbytes; // length of the message written to the buffer
+	send(socket_file_descriptor, "Hello from the client!", 22, 0);
+
+	receive_message(socket_file_descriptor);
+
+	close(socket_file_descriptor);
+
+	return 0;
+}
+
+// get sockaddr, IPv4 or IPv6:
+void *get_in_addr(struct sockaddr *sa) {
+	if (sa->sa_family == AF_INET6) {
+        return &(((struct sockaddr_in6*)sa)->sin6_addr);  // IPv6
+	}
+
+    return &(((struct sockaddr_in*)sa)->sin_addr); // IPv4
+}
+
+void receive_message(int socket_file_descriptor) {
+	int numbytes; // length of the message written to the buffer
 	char buffer[MAXDATASIZE];
 	if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
 	    perror("recv");
@@ -72,8 +85,4 @@ int main(int argc, char *argv[]) {
 	buffer[numbytes] = '\0';
 
 	printf("client: received '%s'\n", buffer);
-
-	close(socket_file_descriptor);
-
-	return 0;
 }
