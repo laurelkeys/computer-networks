@@ -1,7 +1,7 @@
 CC			= gcc
 SOURCES		= $(shell find . -maxdepth 1 -name '*.c')
 OBJS		= $(SOURCES:.c=)
-CFLAGS		=
+CFLAGS		= -lsqlite3
 MAKEFLAGS   = --no-print-directory
 
 %.c:

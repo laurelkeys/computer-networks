@@ -1,6 +1,14 @@
 #include "server.h"
 
+sqlite3 *db;
+sqlite3_stmt *res;
+
 int main(void) {
+	if (1){
+		init_db();
+		opt_get_profiles_filtering_education("Computer Science");
+	} else {
+
 	struct addrinfo hints, *servinfo, *p;
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = STRUCT_IPVX;
@@ -58,6 +66,8 @@ int main(void) {
 		exit(1);
 	}
 
+	atexit(exit_cleanup);
+
 	printf("server: waiting for connections...\n");
 
 	struct sockaddr_storage their_addr; // connector's address information
@@ -91,6 +101,7 @@ int main(void) {
 	}
 
 	exit(0);
+	}
 }
 
 void receive_messages(int socket_file_descriptor) {
@@ -129,4 +140,75 @@ void *get_in_addr(struct sockaddr *sa) {
 	}
 
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+void init_db() {
+    if (sqlite3_open(":memory:", &db) != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        exit(1);
+    }
+	char *sql = "DROP TABLE IF EXISTS Profile;" 
+                "CREATE TABLE Profile(email TEXT PRIMARY KEY, name TEXT, surname TEXT, city TEXT, education TEXT);" //FIXME add picture
+				"CREATE TABLE Skill(email TEXT, skill TEXT, PRIMARY KEY (email, skill));"
+				"CREATE TABLE Experience(email TEXT, experience TEXT, PRIMARY KEY (email, experience));"
+                "INSERT INTO Profile VALUES('uno@mail.com','Uno','Dos','Campinas','Linguistics');" 
+                "INSERT INTO Profile VALUES('tres@mail.com','Tres','Cuatro','London','Computer Science');" 
+                "INSERT INTO Profile VALUES('cinco@mail.com','Cinco','Seis','Seattle','Computer Engineering');" 
+				"INSERT INTO Skill VALUES('uno@mail.com','Acoustic Engineering');" 
+				"INSERT INTO Skill VALUES('uno@mail.com','English');" 
+				"INSERT INTO Skill VALUES('tres@mail.com','Read');" 
+				"INSERT INTO Skill VALUES('tres@mail.com','Write');" 
+				"INSERT INTO Skill VALUES('tres@mail.com','Code');" 
+				"INSERT INTO Skill VALUES('cinco@mail.com','Spanish');" 
+				"INSERT INTO Skill VALUES('cinco@mail.com','English');" 
+				"INSERT INTO Skill VALUES('cinco@mail.com','Reap');" 
+				"INSERT INTO Skill VALUES('cinco@mail.com','Sow');" 
+				"INSERT INTO Experience VALUES('uno@mail.com','Work');" 
+				"INSERT INTO Experience VALUES('uno@mail.com','Research');" 
+				"INSERT INTO Experience VALUES('tres@mail.com','Work');" 
+				"INSERT INTO Experience VALUES('tres@mail.com','Study');" 
+				"INSERT INTO Experience VALUES('cinco@mail.com','Study');" 
+				"INSERT INTO Experience VALUES('cinco@mail.com','Work');" 
+				"INSERT INTO Experience VALUES('cinco@mail.com','Study more');";
+
+	execute_sql(sql);
+	// char *err_msg = 0;
+    // if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK ) {
+    //     fprintf(stderr, "SQL error: %s\n", err_msg);
+    //     sqlite3_free(err_msg);        
+    //     sqlite3_close(db);
+    //     exit(1);
+    // }
+}
+
+void execute_sql(char * sql) {
+	char *err_msg = 0;
+    if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK ) {
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);        
+        sqlite3_close(db);
+        exit(1);
+    } 	
+}
+
+void exit_cleanup() {
+	sqlite3_finalize(res);
+	sqlite3_close(db);
+}
+
+void opt_get_profiles_filtering_education(char * education) {
+	char sql[44+strlen(education)];
+	char * sql_part = "SELECT name FROM Profile WHERE education = '%s'";
+	sprintf(sql, sql_part, education);
+	printf("%s\n", sql);
+
+	execute_sql(sql);
+	// char *err_msg = 0;
+	// if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK ) {
+    //     fprintf(stderr, "SQL error: %s\n", err_msg);
+    //     sqlite3_free(err_msg);        
+    //     sqlite3_close(db);
+    //     exit(1);
+    // } 			
 }
