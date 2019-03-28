@@ -1,44 +1,66 @@
-/*
-** client.c -- a stream socket client demo
-*/
+#include "client.h"
 
-#include "libs.h"
-
-#define MAXDATASIZE 100 // max number of bytes we can get at once
-
-void *get_in_addr(struct sockaddr *sa);
-void receive_message(int socket_file_descriptor);
-
-int main(int argc, char *argv[]) {
+void check_args(int argc) {
 	if (argc != 2) {
 	    fprintf(stderr,"usage: client hostname\n");
 	    exit(1);
 	}
+}
 
-    struct addrinfo hints, *servinfo;
+int main(int argc, char *argv[]) {
+	check_args(argc); // argv[1] is the server's hostname
+
+    struct addrinfo hints;
 	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET; // change to AF_UNSPEC if you also want IPv6
-	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_family = STRUCT_IPV4;
+	hints.ai_socktype = TCP;
 
-    // argv[1] is the hostname
-	int return_value;
-	if ((return_value = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(return_value));
-		return 1;
-	}
+	struct addrinfo *server_info;                          // linked list of addrinfo structures that match the
+	get_server_info(argv[1], PORT, &hints, &server_info);  // server's hostname and PORT (subject to hints' restrictions)
 
-	// loop through all the results and connect to the first we can
     int socket_file_descriptor;
-    struct addrinfo *p;
-	for (p = servinfo; p != NULL; p = p->ai_next) {
-		if ((socket_file_descriptor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+	struct addrinfo *connected_addrinfo;
+	connect_to_first_match(server_info, &socket_file_descriptor, &connected_addrinfo);
+	freeaddrinfo(server_info); // all done with this structure
+
+	/* TODO */
+    char network_addr_string[INET6_ADDRSTRLEN]; // network address of the connected server
+												// (pointed by connected_addrinfo) as a string
+	inet_ntop(connected_addrinfo->ai_family,
+			  get_in_addr((struct sockaddr *)connected_addrinfo->ai_addr),
+			  network_addr_string,
+			  sizeof network_addr_string);
+	printf("client: connecting to %s\n", network_addr_string);
+
+	send(socket_file_descriptor, "Hello from the client!", 22, 0);
+
+	receive_message(socket_file_descriptor);
+	/* end TODO */
+
+	close(socket_file_descriptor);
+
+	exit(0);
+}
+
+void get_server_info(const char *hostname, const char *port, const struct addrinfo *hints, struct addrinfo **server_info) {
+	int return_value;
+	if ((return_value = getaddrinfo(hostname, port, hints, server_info)) != 0) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(return_value));
+		exit(1);
+	}
+}
+
+void connect_to_first_match(struct addrinfo *server_info, int *socket_file_descriptor, struct addrinfo **p) {
+	// loop through all the results and connect to the first we can
+	for (*p = server_info; *p != NULL; *p = (*p)->ai_next) {
+		if ((*socket_file_descriptor = socket((*p)->ai_family, (*p)->ai_socktype, (*p)->ai_protocol)) == -1) {
 			perror("client: socket");
 			continue;
 		}
 
-		if (connect(socket_file_descriptor, p->ai_addr, p->ai_addrlen) == -1) {
+		if (connect(*socket_file_descriptor, (*p)->ai_addr, (*p)->ai_addrlen) == -1) {
 			perror("client: connect");
-			close(socket_file_descriptor);
+			close(*socket_file_descriptor);
 			continue;
 		}
 
@@ -47,28 +69,14 @@ int main(int argc, char *argv[]) {
 
 	if (p == NULL) {
 		fprintf(stderr, "client: failed to connect\n");
-		return 2;
+		exit(2);
 	}
-
-    char network_addr_string[INET6_ADDRSTRLEN]; // network address of the connected server (pointed by p) as a string
-	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr), network_addr_string, sizeof network_addr_string);
-	printf("client: connecting to %s\n", network_addr_string);
-
-	freeaddrinfo(servinfo); // all done with this structure
-
-	send(socket_file_descriptor, "Hello from the client!", 22, 0);
-
-	receive_message(socket_file_descriptor);
-
-	close(socket_file_descriptor);
-
-	return 0;
 }
 
-// get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa) {
+	// get sockaddr, IPv4 or IPv6:
 	if (sa->sa_family == AF_INET6) {
-        return &(((struct sockaddr_in6*)sa)->sin6_addr);  // IPv6
+        return &(((struct sockaddr_in6*)sa)->sin6_addr); // IPv6
 	}
 
     return &(((struct sockaddr_in*)sa)->sin_addr); // IPv4

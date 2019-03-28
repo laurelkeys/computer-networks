@@ -13,7 +13,6 @@
 #define PORT "3490"  // the port users will be connecting to
 #endif
 
-
 #define UDP SOCK_DGRAM
 #define TCP SOCK_STREAM
 
@@ -23,4 +22,3 @@
 
 #define SOCKET_IPV4 PF_INET
 #define SOCKET_IPV6 PF_INET6
-
