@@ -77,13 +77,15 @@ int main(void) {
 
 		if (!fork()) { // this is the child process
 			close(socket_file_descriptor); // child doesn't need the listener
+
 			if (send(new_file_descriptor, "Hello, world!", 13, 0) == -1)
 				perror("send");
+
+			receive_messages(new_file_descriptor);
+
 			close(new_file_descriptor);
 			exit(0);
 		}
-
-		receive_message(new_file_descriptor);
 
 		close(new_file_descriptor);  // parent doesn't need this
 	}
@@ -91,17 +93,22 @@ int main(void) {
 	exit(0);
 }
 
-void receive_message(int socket_file_descriptor) {
+void receive_messages(int socket_file_descriptor) {
 	int numbytes; // length of the message written to the buffer
 	char buffer[MAXDATASIZE];
-	if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
-	    perror("recv");
-	    exit(1);
+
+	while (1) {
+		if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
+		    perror("recv");
+		    exit(1);
+		}
+
+		buffer[numbytes] = '\0';
+
+		printf("client: received '%s'\n", buffer);
+
+		if (buffer[0] == QUIT_CODE_CHR) break; // FIXME
 	}
-
-	buffer[numbytes] = '\0';
-
-	printf("client: received '%s'\n", buffer);
 }
 
 void sigchld_handler(int s) {

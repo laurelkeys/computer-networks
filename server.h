@@ -11,6 +11,6 @@
 
 void sigchld_handler(int s);
 void *get_in_addr(struct sockaddr *sa);
-void receive_message(int socket_file_descriptor);
+void receive_messages(int socket_file_descriptor);
 
 #endif

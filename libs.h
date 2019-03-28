@@ -23,6 +23,10 @@
 #define SOCKET_IPV4 PF_INET
 #define SOCKET_IPV6 PF_INET6
 
+#define QUIT_CODE 7
+#define QUIT_CODE_CHR '7'
+#define QUIT_CODE_STR "7"
+
 typedef struct profile {
     char *email;
     char *name;
