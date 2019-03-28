@@ -1,17 +1,4 @@
-/*
-** server.c -- a stream socket server demo
-*/
-#include <sys/wait.h>
-#include <signal.h>
-
-#include "libs.h"
-
-#define BACKLOG 10	 // how many pending connections queue will hold
-#define MAXDATASIZE 100 // max number of bytes we can get at once
-
-void sigchld_handler(int s);
-void *get_in_addr(struct sockaddr *sa);
-void receive_message(int socket_file_descriptor);
+#include "server.h"
 
 int main(void) {
 	struct addrinfo hints, *servinfo, *p;
@@ -23,12 +10,11 @@ int main(void) {
 
 	if ((return_value = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(return_value));
-		return 1;
+		exit(1);
 	}
 
-
 	int socket_file_descriptor, new_file_descriptor;  // listen on sock_fd, new connection on new_file_descriptor
-	int yes=1;
+	int yes = 1;
 
 	// loop through all the results and bind to the first we can
 	for (p = servinfo; p != NULL; p = p->ai_next) {
@@ -102,7 +88,7 @@ int main(void) {
 		close(new_file_descriptor);  // parent doesn't need this
 	}
 
-	return 0;
+	exit(0);
 }
 
 void receive_message(int socket_file_descriptor) {

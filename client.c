@@ -7,6 +7,8 @@ void check_args(int argc) {
 	}
 }
 
+void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor);
+
 int main(int argc, char *argv[]) {
 	check_args(argc); // argv[1] is the server's hostname
 
@@ -24,22 +26,25 @@ int main(int argc, char *argv[]) {
 	freeaddrinfo(server_info); // all done with this structure
 
 	/* TODO */
-    char network_addr_string[INET6_ADDRSTRLEN]; // network address of the connected server
-												// (pointed by connected_addrinfo) as a string
-	inet_ntop(connected_addrinfo->ai_family,
-			  get_in_addr((struct sockaddr *)connected_addrinfo->ai_addr),
-			  network_addr_string,
-			  sizeof network_addr_string);
-	printf("client: connecting to %s\n", network_addr_string);
-
-	send(socket_file_descriptor, "Hello from the client!", 22, 0);
-
-	receive_message(socket_file_descriptor);
+	just_do_it(connected_addrinfo, socket_file_descriptor);
 	/* end TODO */
 
 	close(socket_file_descriptor);
 
 	exit(0);
+}
+
+void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor) {
+	char network_addr_string[INET6_ADDRSTRLEN]; // network address of the connected server
+												// (pointed by connected_addrinfo) as a string
+	inet_ntop(connected_addrinfo->ai_family,
+		      get_in_addr(connected_addrinfo->ai_addr),
+			  network_addr_string, sizeof network_addr_string);
+	printf("client: connecting to %s\n", network_addr_string);
+
+	send(socket_file_descriptor, "Hello from the client!", 22, 0);
+
+	receive_message(socket_file_descriptor);
 }
 
 void get_server_info(const char *hostname, const char *port, const struct addrinfo *hints, struct addrinfo **server_info) {
@@ -75,7 +80,7 @@ void connect_to_first_match(struct addrinfo *server_info, int *socket_file_descr
 
 void *get_in_addr(struct sockaddr *sa) {
 	// get sockaddr, IPv4 or IPv6:
-	if (sa->sa_family == AF_INET6) {
+	if (sa->sa_family == STRUCT_IPV6) {
         return &(((struct sockaddr_in6*)sa)->sin6_addr); // IPv6
 	}
 
