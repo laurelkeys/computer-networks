@@ -173,18 +173,11 @@ void init_db() {
 				"INSERT INTO Experience VALUES('cinco@mail.com','Study more');";
 
 	execute_sql(sql);
-	// char *err_msg = 0;
-    // if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK ) {
-    //     fprintf(stderr, "SQL error: %s\n", err_msg);
-    //     sqlite3_free(err_msg);        
-    //     sqlite3_close(db);
-    //     exit(1);
-    // }
 }
 
 void execute_sql(char * sql) {
 	char *err_msg = 0;
-    if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK ) {
+    if (sqlite3_exec(db, sql, send_info_callback, 0, &err_msg) != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);        
         sqlite3_close(db);
@@ -197,18 +190,16 @@ void exit_cleanup() {
 	sqlite3_close(db);
 }
 
+int send_info_callback(void *not_used, int length, char **column_content, char **column_name) {
+	for (int i = 0; i < length; i++) {
+        printf("%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");
+    }
+	return 0;
+}
+
 void opt_get_profiles_filtering_education(char * education) {
-	char sql[44+strlen(education)];
+	char sql[46+strlen(education)];
 	char * sql_part = "SELECT name FROM Profile WHERE education = '%s'";
 	sprintf(sql, sql_part, education);
-	printf("%s\n", sql);
-
-	execute_sql(sql);
-	// char *err_msg = 0;
-	// if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK ) {
-    //     fprintf(stderr, "SQL error: %s\n", err_msg);
-    //     sqlite3_free(err_msg);        
-    //     sqlite3_close(db);
-    //     exit(1);
-    // } 			
+	execute_sql(sql);	
 }

@@ -19,11 +19,13 @@ void exit_cleanup();
 // DB related stuff
 void init_db();
 void execute_sql(char * sql);
-void opt_get_profiles_filtering_education();
-void opt_get_skills_filtering_city();
-void opt_add_skill_to_profile();
-void opt_get_experience_from_profile();
+int send_info_callback(void *not_used, int length, char **column_content, char **column_name);
+
+void opt_get_profiles_filtering_education(char * education);
+void opt_get_skills_filtering_city(char * city);
+void opt_add_skill_to_profile(char * email, char * skill);
+void opt_get_experience_from_profile(char * email);
 void opt_get_profiles();
-void opt_get_profile();
+void opt_get_profile(char * email);
 
 #endif
