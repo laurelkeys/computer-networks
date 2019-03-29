@@ -203,3 +203,10 @@ void opt_get_profiles_filtering_education(char * education) {
 	sprintf(sql, sql_part, education);
 	execute_sql(sql);	
 }
+
+void opt_add_skill_to_profile(char * email, char * skill) {
+	char sql[35+strlen(email)+strlen(skill)];
+	char * sql_part = "INSERT INTO Skill VALUES('%s','%s')";
+	sprintf(sql, email, skill);
+	execute_sql(sql);
+}
