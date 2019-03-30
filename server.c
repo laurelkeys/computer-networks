@@ -6,7 +6,7 @@ sqlite3_stmt *res;
 int main(void) {
 	if (1){
 		init_db();
-		opt_get_profiles_filtering_education("Computer Science");
+		opt_get_skills_filtering_city("Campinas");
 	} else {
 
 	struct addrinfo hints, *servinfo, *p;
@@ -149,11 +149,13 @@ void init_db() {
         exit(1);
     }
 	char *sql = "DROP TABLE IF EXISTS Profile;" 
+				"DROP TABLE IF EXISTS Skill;" 
+				"DROP TABLE IF EXISTS Experience;" 
                 "CREATE TABLE Profile(email TEXT PRIMARY KEY, name TEXT, surname TEXT, city TEXT, education TEXT);" //FIXME add picture
 				"CREATE TABLE Skill(email TEXT, skill TEXT, PRIMARY KEY (email, skill));"
 				"CREATE TABLE Experience(email TEXT, experience TEXT, PRIMARY KEY (email, experience));"
                 "INSERT INTO Profile VALUES('uno@mail.com','Uno','Dos','Campinas','Linguistics');" 
-                "INSERT INTO Profile VALUES('tres@mail.com','Tres','Cuatro','London','Computer Science');" 
+                "INSERT INTO Profile VALUES('tres@mail.com','Tres','Cuatro','Campinas','Computer Science');" 
                 "INSERT INTO Profile VALUES('cinco@mail.com','Cinco','Seis','Seattle','Computer Engineering');" 
 				"INSERT INTO Skill VALUES('uno@mail.com','Acoustic Engineering');" 
 				"INSERT INTO Skill VALUES('uno@mail.com','English');" 
@@ -191,6 +193,7 @@ void exit_cleanup() {
 }
 
 int send_info_callback(void *not_used, int length, char **column_content, char **column_name) {
+	printf("Callback\n");
 	for (int i = 0; i < length; i++) {
         printf("%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");
     }
@@ -204,9 +207,17 @@ void opt_get_profiles_filtering_education(char * education) {
 	execute_sql(sql);	
 }
 
+void opt_get_skills_filtering_city(char * city) {
+	char sql[119+strlen(city)];
+	char * sql_part = "SELECT Profile.name, Skill.skill FROM Profile INNER JOIN Skill ON Skill.email = Profile.email WHERE Profile.city = '%s'";
+	sprintf(sql, sql_part, city);
+	execute_sql(sql);
+}
+
 void opt_add_skill_to_profile(char * email, char * skill) {
 	char sql[35+strlen(email)+strlen(skill)];
 	char * sql_part = "INSERT INTO Skill VALUES('%s','%s')";
-	sprintf(sql, email, skill);
+	sprintf(sql, sql_part, email, skill);
 	execute_sql(sql);
 }
+
