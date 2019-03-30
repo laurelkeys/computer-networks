@@ -1,15 +1,24 @@
 CC			= gcc
 SOURCES		= $(shell find . -maxdepth 1 -name '*.c')
-OBJS		= $(SOURCES:.c=)
-CFLAGS		= -lsqlite3
+EXECS		= $(SOURCES:.c=)
+OBJS        = $(SOURCES:.c=.o)
+CFLAGS      = -g
+LDFLAGS		= -lsqlite3
 MAKEFLAGS   = --no-print-directory
 
-%.c:
-	$(CC) $(CFLAGS) $@.c -o $@
+.PHONY: all clean
 
-all:
-	@make --no-print-directory clean
-	@make --no-print-directory $(OBJS);
+%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+all: $(EXECS)
 
 clean:
-	rm -rf $(OBJS)
+	rm -f $(OBJS) $(EXECS)
+
+client: client.o
+	$(CC) $^ $(LDFLAGS) -o $@
+
+server: server.o
+	$(CC) $^ $(LDFLAGS) -o $@
+
