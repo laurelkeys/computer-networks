@@ -227,3 +227,14 @@ void opt_get_experience_from_profile(char * email) {
 	sprintf(sql, sql_part, email);
 	execute_sql(sql);
 }
+
+void opt_get_profile(char * email) {
+	char sql[287+strlen(email)];
+	char * sql_part = "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skill.skill, Experience.experience "
+					  "FROM Profile "
+					  "INNER JOIN Skill ON Skill.email = Profile.email "
+					  "INNER JOIN Skill ON Experience.email = Profile.email "
+					  "WHERE Profile.email = '%s';";
+	sprintf(sql, sql_part, email);
+	execute_sql(sql);
+}
