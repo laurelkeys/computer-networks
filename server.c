@@ -4,11 +4,6 @@ sqlite3 *db;
 sqlite3_stmt *res;
 
 int main(void) {
-    if (1){
-        init_db();
-        opt_get_skills_filtering_city("Campinas");
-    } else {
-
     struct addrinfo hints, *servinfo, *p;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = STRUCT_IPVX;
@@ -101,7 +96,7 @@ int main(void) {
     }
 
     exit(0);
-    }
+    // }
 }
 
 void receive_messages(int socket_file_descriptor) {
@@ -118,7 +113,7 @@ void receive_messages(int socket_file_descriptor) {
 
         printf("client: received '%s'\n", buffer);
 
-        if (buffer[0] == QUIT_CODE_CHR) break; // FIXME
+        if (buffer[0] == '7') break; // FIXME
     }
 }
 
