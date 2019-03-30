@@ -221,3 +221,9 @@ void opt_add_skill_to_profile(char * email, char * skill) {
 	execute_sql(sql);
 }
 
+void opt_get_experience_from_profile(char * email) {
+	char sql[119+strlen(email)];
+	char * sql_part = "SELECT experience FROM Experience WHERE email = '%s'";
+	sprintf(sql, sql_part, email);
+	execute_sql(sql);
+}
