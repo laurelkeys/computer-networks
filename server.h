@@ -14,11 +14,21 @@ void sigchld_handler(int s);
 void *get_in_addr(struct sockaddr *sa);
 void receive_messages(int socket_file_descriptor);
 void exit_cleanup();
+void get_server_addrinfo(const char *hostname, const char *port, struct addrinfo **server_addrinfo);
+void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_descriptor, struct addrinfo **p);
 
 // DB related stuff
 void init_db();
 void execute_sql(char * sql);
 int send_info_callback(void *not_used, int length, char **column_content, char **column_name);
+
+// _opt_<> receives the input and then calls opt_<>
+void _opt_get_profiles_filtering_education(int socket_file_descriptor);
+void _opt_get_skills_filtering_city(int socket_file_descriptor);
+void _opt_add_skill_to_profile(int socket_file_descriptor);
+void _opt_get_experience_from_profile(int socket_file_descriptor);
+void _opt_get_profiles(int socket_file_descriptor);
+void _opt_get_profile(int socket_file_descriptor);
 
 void opt_get_profiles_filtering_education(char * education);
 void opt_get_skills_filtering_city(char * city);

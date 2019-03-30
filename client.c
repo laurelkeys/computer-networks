@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
 void receive_message(int socket_file_descriptor) {
     int numbytes; // length of the message written to the buffer
     char buffer[MAXDATASIZE];
+
     if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
         perror("recv");
         exit(1);
@@ -80,6 +81,8 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
                 quit = 1;
                 break;
         }
+
+        send(socket_file_descriptor, "OPT_END", 7, SEND_NO_FLAGS);
     }
 
     printf("          / )\n");
@@ -91,7 +94,7 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
     printf("  ---.._______)\n\n");
 }
 
-// OPTIONS
+// OPTIONS //////////////////////////////
 
 static int _validate_input(int code, char *no_input_msg, char *too_long_msg, char *input_buffer) {
     if (code == NO_INPUT) {
@@ -231,7 +234,7 @@ void print_options_list(int socket_file_descriptor) {
     printf("(%s) sair.\n\n", OPT_QUIT_STR);
 }
 
-// CONNECTION 
+// CONNECTION ///////////////////////////
 
 void get_server_addrinfo(const char *hostname, const char *port, struct addrinfo **server_addrinfo) {
     struct addrinfo hints;
