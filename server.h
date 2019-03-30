@@ -9,7 +9,6 @@
 #include "libs.h"
 
 #define BACKLOG 10 // how many pending connections queue will hold
-#define MAXDATASIZE 100 // max number of bytes we can get at onces
 
 void sigchld_handler(int s);
 void *get_in_addr(struct sockaddr *sa);

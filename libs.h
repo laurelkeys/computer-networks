@@ -23,8 +23,8 @@
 #define SOCKET_IPV4 PF_INET
 #define SOCKET_IPV6 PF_INET6
 
+#define MAXDATASIZE 102 // max number of bytes we can get at onces
 #define SEND_NO_FLAGS 0
-
 #define OPT_QUIT_STR "7"
 
 typedef struct profile {

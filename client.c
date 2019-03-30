@@ -1,6 +1,6 @@
 #include "client.h"
 
-void check_args(int argc) {
+static void _check_args(int argc) {
     if (argc != 2) {
         fprintf(stderr,"usage: client hostname\n");
         exit(1);
@@ -9,7 +9,7 @@ void check_args(int argc) {
 
 int main(int argc, char *argv[]) {
     // argv[1] is the server's hostname
-    check_args(argc);
+    _check_args(argc);
 
     // linked list of addrinfo structures that match the server's hostname and PORT
     struct addrinfo *server_addrinfo;
@@ -93,30 +93,7 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
 
 // OPTIONS
 
-#define OK       0
-#define NO_INPUT 1
-#define TOO_LONG 2
-
-static int get_input(char *input, char *input_buffer, size_t max_size) {
-    if (input != NULL) {
-        printf ("%s", input);
-        fflush (stdout);
-    }
-
-    if (fgets (input_buffer, max_size, stdin) == NULL) return NO_INPUT;
-
-    int next_char, too_long;
-    if (input_buffer[strlen(input_buffer) - 1] != '\n') {
-        too_long = 0;
-        while (((next_char = getchar()) != '\n') && (next_char != EOF)) too_long = 1;
-        return too_long ? TOO_LONG : OK;
-    } else {
-        input_buffer[strlen(input_buffer) - 1] = '\0';
-        return OK;
-    }
-}
-
-int validate_input(int code, char *no_input_msg, char *too_long_msg, char *input_buffer) {
+static int _validate_input(int code, char *no_input_msg, char *too_long_msg, char *input_buffer) {
     if (code == NO_INPUT) {
         printf ("%s\n", no_input_msg);
         return !OK;
@@ -130,6 +107,27 @@ int validate_input(int code, char *no_input_msg, char *too_long_msg, char *input
     return OK;
 }
 
+int get_input(char *input, char *input_buffer, size_t max_size) {
+    if (input != NULL) {
+        printf("%s", input);
+        fflush(stdout);
+    }
+
+    if (fgets(input_buffer, max_size, stdin) == NULL) return NO_INPUT;
+
+    int next_char, too_long;
+    if (input_buffer[strlen(input_buffer) - 1] != '\n') {
+        too_long = 0;
+        while (((next_char = getchar()) != '\n') && (next_char != EOF)) {
+            too_long = 1;
+        }
+        return too_long ? TOO_LONG : OK;
+    } else {
+        input_buffer[strlen(input_buffer) - 1] = '\0';
+        return OK;
+    }
+}
+
 // (1) listar todas as pessoas formadas em um determinado curso
 void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     send(socket_file_descriptor, "1", 1, SEND_NO_FLAGS);
@@ -138,7 +136,7 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     char input_buffer[50]; // education length <= 48
 
     return_value = get_input("Digite o curso> ", input_buffer, sizeof(input_buffer));
-    if (validate_input(return_value, "\nCurso não digitado", "Nome muito longo ", input_buffer) != OK)
+    if (_validate_input(return_value, "\nCurso não digitado", "Nome muito longo ", input_buffer) != OK)
         return;
 
     printf ("Curso escolhido: '%s'\n\n", input_buffer);
@@ -153,7 +151,7 @@ void opt_get_skills_filtering_city(int socket_file_descriptor) {
     char input_buffer[50]; // city length <= 48
 
     return_value = get_input("Digite a cidade> ", input_buffer, sizeof(input_buffer));    
-    if (validate_input(return_value, "\nCidade não digitada", "Nome muito longo ", input_buffer) != OK)
+    if (_validate_input(return_value, "\nCidade não digitada", "Nome muito longo ", input_buffer) != OK)
         return;
 
     printf("Cidade escolhida: '%s'\n\n", input_buffer);
@@ -168,14 +166,14 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
     char input_buffer[60]; // email/skill length <= 58
 
     return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));    
-    if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
+    if (_validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
 
     send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
     // TODO verify if the profile exists before asking for the skill
 
     return_value = get_input("Digite a habilidade> ", input_buffer, sizeof(input_buffer));    
-    if (validate_input(return_value, "\nHabilidade não digitada", "Nome muito longo ", input_buffer) != OK)
+    if (_validate_input(return_value, "\nHabilidade não digitada", "Nome muito longo ", input_buffer) != OK)
         return;
 
     send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
@@ -189,7 +187,7 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
     char input_buffer[60]; // email length <= 58
 
     return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));    
-    if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
+    if (_validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
 
     send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
@@ -208,7 +206,7 @@ void opt_get_profile(int socket_file_descriptor) {
     char input_buffer[60]; // email length <= 58
 
     return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));    
-    if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
+    if (_validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
 
     send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
@@ -270,13 +268,4 @@ void connect_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_d
         fprintf(stderr, "client: failed to connect\n");
         exit(2);
     }
-}
-
-void *get_in_addr(struct sockaddr *sa) {
-    // get sockaddr, IPv4 or IPv6:
-    if (sa->sa_family == STRUCT_IPV6) {
-        return &(((struct sockaddr_in6*)sa)->sin6_addr); // IPv6
-    }
-
-    return &(((struct sockaddr_in*)sa)->sin_addr); // IPv4
 }
