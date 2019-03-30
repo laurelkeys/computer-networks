@@ -113,7 +113,7 @@ void receive_messages(int socket_file_descriptor) {
 
         printf("client: received '%s'\n", buffer);
 
-        if (buffer[0] == '7') break; // FIXME
+        if (buffer[0] == OPT_QUIT_STR[0]) break; // FIXME
     }
 }
 

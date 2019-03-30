@@ -51,8 +51,16 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
     while (!quit) {
         print_options_list();
 
-        scanf("%d", &option);
+        char *end;
+        char option_buffer[3]; // ['option', '\n', '\0']
+        do {
+             if (!fgets(option_buffer, sizeof option_buffer, stdin)) break;             
+             option_buffer[strlen(option_buffer) - 1] = 0; // remove newline
+             option = strtol(option_buffer, &end, 10);
+        } while (end != option_buffer + strlen(option_buffer));
+
         printf("\n-- (%d) --\n", option);
+        option = (option >= 1 && option <= 6) ? option : 7;
         switch (option) {
             case 1: opt_get_profiles_filtering_education(socket_file_descriptor);
             break;
@@ -67,8 +75,8 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
             case 6: opt_get_profile(socket_file_descriptor);
             break;
             default:
-                send(socket_file_descriptor, "Goodbye from client!", 24, SEND_NO_FLAGS);
-                send(socket_file_descriptor, "7", 1, SEND_NO_FLAGS);
+                // send(socket_file_descriptor, "Goodbye from client!", 24, SEND_NO_FLAGS);
+                send(socket_file_descriptor, OPT_QUIT_STR, 1, SEND_NO_FLAGS);
                 quit = 1;
                 break;
         }
@@ -85,26 +93,32 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
 
 // OPTIONS
 
+// (1) listar todas as pessoas formadas em um determinado curso
 void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     send(socket_file_descriptor, "1", 1, SEND_NO_FLAGS);
 }
 
+// (2) listar as habilidades dos perfis que moram em uma determinada cidade
 void opt_get_skills_filtering_city(int socket_file_descriptor) {
     send(socket_file_descriptor, "2", 1, SEND_NO_FLAGS);
 }
 
+// (3) acrescentar uma nova experiência em um perfil
 void opt_add_skill_to_profile(int socket_file_descriptor) {
     send(socket_file_descriptor, "3", 1, SEND_NO_FLAGS);
 }
 
+// (4) dado o email do perfil, retornar sua experiência
 void opt_get_experience_from_profile(int socket_file_descriptor) {
     send(socket_file_descriptor, "4", 1, SEND_NO_FLAGS);
 }
 
+// (5) listar todas as informações de todos os perfis
 void opt_get_profiles(int socket_file_descriptor) {
     send(socket_file_descriptor, "5", 1, SEND_NO_FLAGS);
 }
 
+// (6) dado o email de um perfil, retornar suas informações
 void opt_get_profile(int socket_file_descriptor) {
     send(socket_file_descriptor, "6", 1, SEND_NO_FLAGS);
 }
@@ -125,7 +139,7 @@ void print_options_list(int socket_file_descriptor) {
     printf("(6) dado o email de um perfil, retornar suas informações;\n");
     // opt_get_profile()
 
-    printf("(7) sair.\n\n");
+    printf("(%s) sair.\n\n", OPT_QUIT_STR);
 }
 
 // CONNECTION 

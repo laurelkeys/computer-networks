@@ -25,6 +25,8 @@
 
 #define SEND_NO_FLAGS 0
 
+#define OPT_QUIT_STR "7"
+
 typedef struct profile {
     char *email;
     char *name;
