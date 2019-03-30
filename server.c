@@ -4,6 +4,8 @@ sqlite3 *db;
 sqlite3_stmt *res;
 
 int main(void) {
+    init_db();
+
     struct addrinfo *server_addrinfo;
     get_server_addrinfo(NULL, PORT, &server_addrinfo);
 
@@ -175,7 +177,7 @@ void opt_get_profiles() {
         "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skill.skill, Experience.experience "
         "FROM Profile "
         "INNER JOIN Skill ON Skill.email = Profile.email "
-        "INNER JOIN Skill ON Experience.email = Profile.email;";
+        "INNER JOIN Experience ON Experience.email = Profile.email;";
     execute_sql(sql);
 }
 
@@ -185,7 +187,7 @@ void opt_get_profile(char *email) {
         "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skill.skill, Experience.experience "
         "FROM Profile "
         "INNER JOIN Skill ON Skill.email = Profile.email "
-        "INNER JOIN Skill ON Experience.email = Profile.email "
+        "INNER JOIN Experience ON Experience.email = Profile.email "
         "WHERE Profile.email = '%s';";
     sprintf(sql, sql_part, email);
     execute_sql(sql);
