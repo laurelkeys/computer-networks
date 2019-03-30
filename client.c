@@ -91,20 +91,20 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
                 opt_get_profile();
                 break;
             default:
-		        send(socket_file_descriptor, "Goodbye from the client!", 24, 0);
+                send(socket_file_descriptor, "Goodbye from the client!", 24, 0);
                 send(socket_file_descriptor, QUIT_CODE_STR, 1, 0);
                 quit = 1;
                 break;
         }
     }
 
-	printf("          / )\n");
-	printf("        .' /\n");
-	printf("   ----'  (____\n");
-	printf("              _)\n");
-	printf("              __)\n");
-	printf("             __)   Até logo!\n");
-	printf("  ---.._______)\n\n");
+    printf("          / )\n");
+    printf("        .' /\n");
+    printf("   ----'  (____\n");
+    printf("              _)\n");
+    printf("              __)\n");
+    printf("             __)   Até logo!\n");
+    printf("  ---.._______)\n\n");
 }
 
 void get_server_info(const char *hostname, const char *port, const struct addrinfo *hints, struct addrinfo **server_info) {
