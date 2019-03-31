@@ -27,8 +27,23 @@ int msg_size_to_int(char * size) {
 
 int send_wrapper(int file_descriptor, char * message) {
     int msg_size = strlen(message);
+    char * header = msg_size_to_str(msg_size);
+    msg_size += HEADER_SIZE;
+    char buffer[msg_size];
+    strcat(buffer, header);
+    strcat(buffer, message);
 
-    return 0;
+    int bytes_sent = 0; // how many bytes we've sent
+    int bytes_left = msg_size; // how many we have left to send
+    int n;
+    while (bytes_sent < msg_size) {
+        n = send(file_descriptor, message+bytes_sent, bytes_left, 0);
+        if (n == -1) { break; }
+        bytes_sent += n;
+        bytes_left -= n;
+    }
+    
+    return bytes_left; // return # of unsent bytes
 }
 
 int recv_wrapper(int file_descriptor, char * buffer) {
