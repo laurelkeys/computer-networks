@@ -3,8 +3,50 @@
 sqlite3 *db;
 sqlite3_stmt *res;
 
+void profile_skills() {
+    char *sql = 
+        "SELECT Profile.email, GROUP_CONCAT(Skill.skill, ', ') AS skills "
+        "FROM Profile "
+        "INNER JOIN Skill ON Skill.email = Profile.email "
+        "GROUP BY Profile.email;";
+    execute_sql(sql);
+}
+
+void profile_experiences() {
+    char *sql = 
+        "SELECT Profile.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences "
+        "FROM Profile "
+        "INNER JOIN Experience ON Experience.email = Profile.email "
+        "GROUP BY Profile.email;";
+    execute_sql(sql);
+}
+
+void profiles() {
+    char *sql = 
+        "SELECT Profile.email, Profile.name "
+        "FROM Profile;";
+    execute_sql(sql);
+}
+
+void join() {
+    char *sql = 
+        "SELECT Profile.name, Skills.skills, Experiences.experiences "
+        "FROM Profile "
+        "INNER JOIN (SELECT Profile.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Profile INNER JOIN Skill ON Skill.email = Profile.email GROUP BY Profile.email) AS Skills "
+        "ON Profile.email = Skills.email "
+        "INNER JOIN (SELECT Profile.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Profile INNER JOIN Experience ON Experience.email = Profile.email GROUP BY Profile.email) AS Experiences "
+        "ON Profile.email = Experiences.email "
+        "GROUP BY Profile.email;";
+    execute_sql(sql);
+}
+
 int main(void) {
     init_db();
+
+    //
+    opt_get_profiles();
+    exit(0);
+    //
 
     struct addrinfo *server_addrinfo;
     get_server_addrinfo(NULL, PORT, &server_addrinfo);
@@ -173,11 +215,20 @@ void opt_get_experience_from_profile(char *email) {
 }
 
 void opt_get_profiles() {
+    // char *sql = 
+    //     "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skill.skill, Experience.experience "
+    //     "FROM Profile "
+    //     "INNER JOIN Skill ON Skill.email = Profile.email "
+    //     "INNER JOIN Experience ON Experience.email = Profile.email;";
+
     char *sql = 
-        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skill.skill, Experience.experience "
+        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
         "FROM Profile "
-        "INNER JOIN Skill ON Skill.email = Profile.email "
-        "INNER JOIN Experience ON Experience.email = Profile.email;";
+        "INNER JOIN (SELECT Profile.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Profile INNER JOIN Skill ON Skill.email = Profile.email GROUP BY Profile.email) AS Skills "
+        "ON Profile.email = Skills.email "
+        "INNER JOIN (SELECT Profile.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Profile INNER JOIN Experience ON Experience.email = Profile.email GROUP BY Profile.email) AS Experiences "
+        "ON Profile.email = Experiences.email "
+        "GROUP BY Profile.email;";
     execute_sql(sql);
 }
 
@@ -256,7 +307,7 @@ void exit_cleanup() {
 }
 
 int send_info_callback(void *not_used, int length, char **column_content, char **column_name) {
-    printf("Callback\n");
+    printf("\nCallback\n");
     // TODO send queried info to client
     for (int i = 0; i < length; i++) {
         printf("%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");
@@ -275,12 +326,15 @@ void init_db() {
         "DROP TABLE IF EXISTS Profile;" 
         "DROP TABLE IF EXISTS Skill;" 
         "DROP TABLE IF EXISTS Experience;" 
+        
         "CREATE TABLE Profile(email TEXT PRIMARY KEY, name TEXT, surname TEXT, city TEXT, education TEXT);" //FIXME add picture
         "CREATE TABLE Skill(email TEXT, skill TEXT, PRIMARY KEY (email, skill));"
         "CREATE TABLE Experience(email TEXT, experience TEXT, PRIMARY KEY (email, experience));"
+        
         "INSERT INTO Profile VALUES('uno@mail.com','Uno','Dos','Campinas','Linguistics');" 
         "INSERT INTO Profile VALUES('tres@mail.com','Tres','Cuatro','Campinas','Computer Science');" 
         "INSERT INTO Profile VALUES('cinco@mail.com','Cinco','Seis','Seattle','Computer Engineering');" 
+        
         "INSERT INTO Skill VALUES('uno@mail.com','Acoustic Engineering');" 
         "INSERT INTO Skill VALUES('uno@mail.com','English');" 
         "INSERT INTO Skill VALUES('tres@mail.com','Read');" 
@@ -290,6 +344,7 @@ void init_db() {
         "INSERT INTO Skill VALUES('cinco@mail.com','English');" 
         "INSERT INTO Skill VALUES('cinco@mail.com','Reap');" 
         "INSERT INTO Skill VALUES('cinco@mail.com','Sow');" 
+        
         "INSERT INTO Experience VALUES('uno@mail.com','Work');" 
         "INSERT INTO Experience VALUES('uno@mail.com','Research');" 
         "INSERT INTO Experience VALUES('tres@mail.com','Work');" 
