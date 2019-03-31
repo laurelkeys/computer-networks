@@ -55,8 +55,10 @@ int main(void) {
         if (!fork()) { // this is the child process
             close(socket_file_descriptor); // child doesn't need the listener
 
-            if (send(new_file_descriptor, "Hello, world!", 13, 0) == -1)
-                perror("send");
+            int bytes_left = send_wrapper(new_file_descriptor, "Server Hello");
+            printf("Hello bytes_left: %d\n", bytes_left);
+            // if (send(new_file_descriptor, "Hello, world!", 13, 0) == -1)
+            //     perror("send");
 
             receive_messages(new_file_descriptor);
 
@@ -72,17 +74,20 @@ int main(void) {
 
 void receive_messages(int socket_file_descriptor) {
     int numbytes; // length of the message written to the buffer
-    char buffer[MAXDATASIZE];
+    char *buffer;
 
     while (1) {
-        if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
-            perror("recv");
-            exit(1);
-        }
+        // if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
+        //     perror("recv");
+        //     exit(1);
+        // }
 
-        buffer[numbytes] = '\0';
-
-        printf("client: received '%s'\n", buffer);
+        // buffer[numbytes] = '\0';
+        recv_wrapper(socket_file_descriptor, &buffer);
+        printf("recv_wrapper '%s'\n", buffer);
+        free(buffer);
+        continue;
+        // printf("client: received '%s'\n", buffer);
 
         if (buffer[0] == OPT_QUIT_STR[0]) break; // FIXME
 
@@ -127,22 +132,22 @@ void *get_in_addr(struct sockaddr *sa) {
 
 void _opt_get_profiles_filtering_education(int socket_file_descriptor) {
     printf("option selected: 1\n");
-    if (send(socket_file_descriptor, "opt selected: 1", 15, 0) == -1) perror("send");
+    // if (send(socket_file_descriptor, "opt selected: 1", 15, 0) == -1) perror("send");
 }
 
 void _opt_get_skills_filtering_city(int socket_file_descriptor) {
     printf("option selected: 2\n");
-    if (send(socket_file_descriptor, "opt selected: 2", 15, 0) == -1) perror("send");
+    // if (send(socket_file_descriptor, "opt selected: 2", 15, 0) == -1) perror("send");
 }
 
 void _opt_add_skill_to_profile(int socket_file_descriptor) {
     printf("option selected: 3\n");
-    if (send(socket_file_descriptor, "opt selected: 3", 15, 0) == -1) perror("send");
+    // if (send(socket_file_descriptor, "opt selected: 3", 15, 0) == -1) perror("send");
 }
 
 void _opt_get_experience_from_profile(int socket_file_descriptor) {
     printf("option selected: 4\n");
-    if (send(socket_file_descriptor, "opt selected: 4", 15, 0) == -1) perror("send");
+    // if (send(socket_file_descriptor, "opt selected: 4", 15, 0) == -1) perror("send");
 }
 
 void send_file_to_client(FILE *f) {  
@@ -154,16 +159,20 @@ void send_file_to_client(FILE *f) {
 
 }
 
+// FIXME
 void _opt_get_profiles(int socket_file_descriptor) {
     printf("option selected: 5\n");
-    if (send(socket_file_descriptor, "opt selected: 5", 15, 0) == -1) perror("send");
+    int bytes_left = send_wrapper(socket_file_descriptor, "opt selected: 5");
+    printf("bytes_left: %d\n", bytes_left);
+
+    // if (send(socket_file_descriptor, "opt selected: 5", 15, 0) == -1) perror("send");
     opt_get_profiles(); // queries database
     send_file_to_client(fopen("result.txt", "r"));
 }
 
 void _opt_get_profile(int socket_file_descriptor) {
     printf("option selected: 6\n");
-    if (send(socket_file_descriptor, "opt selected: 6", 15, 0) == -1) perror("send");
+    // if (send(socket_file_descriptor, "opt selected: 6", 15, 0) == -1) perror("send");
 }
 
 void opt_get_profiles_filtering_education(char *education) {

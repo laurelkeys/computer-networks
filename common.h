@@ -3,9 +3,9 @@
 
 #include "libs.h"
 
-#define HEADER_SIZE 12
+#define HEADER_SIZE 12 + 1
 
-int send_wrapper(int file_descriptor, char * message);
-int recv_wrapper(int file_descriptor, char * buffer);
+int send_wrapper(int file_descriptor, char *message);
+int recv_wrapper(int file_descriptor, char **buffer);
 
 #endif

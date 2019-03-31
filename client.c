@@ -22,6 +22,18 @@ int main(int argc, char *argv[]) {
     connect_to_first_match(server_addrinfo, &socket_file_descriptor, &connected_addrinfo);
     freeaddrinfo(server_addrinfo);
 
+    // FIXME delete
+    send_wrapper(socket_file_descriptor, "Hello!!");
+    send_wrapper(socket_file_descriptor, "How are you today m@t3??");
+    send_wrapper(socket_file_descriptor, "test1nG s^om'e cháràctérzZ..");
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer);
+    printf("recv_wrapper: '%s'\n", buffer);
+    free(buffer);
+
+    exit(0);
+
     // does the work ;)
     just_do_it(connected_addrinfo, socket_file_descriptor);
 
@@ -45,7 +57,7 @@ void receive_message(int socket_file_descriptor) {
 
 void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor) {
     // receive_message(socket_file_descriptor);
-    send(socket_file_descriptor, "Hello from client!", 22, SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, "Hello from client!");
 
     int option;
     int quit = 0;
@@ -77,7 +89,7 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
             break;
             default:
                 // send(socket_file_descriptor, "Goodbye from client!", 24, SEND_NO_FLAGS);
-                send(socket_file_descriptor, OPT_QUIT_STR, 1, SEND_NO_FLAGS);
+                send_wrapper(socket_file_descriptor, OPT_QUIT_STR);
                 quit = 1;
                 break;
         }
@@ -133,7 +145,7 @@ int get_input(char *input, char *input_buffer, size_t max_size) {
 
 // (1) listar todas as pessoas formadas em um determinado curso
 void opt_get_profiles_filtering_education(int socket_file_descriptor) {
-    send(socket_file_descriptor, "1", 1, SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, "1");
 
     int return_value;
     char input_buffer[50]; // education length <= 48
@@ -143,12 +155,12 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
         return;
 
     printf ("Curso escolhido: '%s'\n\n", input_buffer);
-    send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, input_buffer);
 }
 
 // (2) listar as habilidades dos perfis que moram em uma determinada cidade
 void opt_get_skills_filtering_city(int socket_file_descriptor) {
-    send(socket_file_descriptor, "2", 1, SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, "2");
 
     int return_value;
     char input_buffer[50]; // city length <= 48
@@ -158,12 +170,12 @@ void opt_get_skills_filtering_city(int socket_file_descriptor) {
         return;
 
     printf("Cidade escolhida: '%s'\n\n", input_buffer);
-    send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, input_buffer);
 }
 
 // (3) acrescentar uma nova experiência em um perfil
 void opt_add_skill_to_profile(int socket_file_descriptor) {
-    send(socket_file_descriptor, "3", 1, SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, "3");
 
     int return_value;
     char input_buffer[60]; // email/skill length <= 58
@@ -172,19 +184,19 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
     if (_validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
 
-    send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, input_buffer);
     // TODO verify if the profile exists before asking for the skill
 
     return_value = get_input("Digite a habilidade> ", input_buffer, sizeof(input_buffer));    
     if (_validate_input(return_value, "\nHabilidade não digitada", "Nome muito longo ", input_buffer) != OK)
         return;
 
-    send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, input_buffer);
 }
 
 // (4) dado o email do perfil, retornar sua experiência
 void opt_get_experience_from_profile(int socket_file_descriptor) {
-    send(socket_file_descriptor, "4", 1, SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, "4");
 
     int return_value;
     char input_buffer[60]; // email length <= 58
@@ -193,18 +205,18 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
     if (_validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
 
-    send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, input_buffer);
 }
 
 // (5) listar todas as informações de todos os perfis
 void opt_get_profiles(int socket_file_descriptor) {
-    send(socket_file_descriptor, "5", 1, SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, "5");
 
     // int file_size;
     // TODO get response size and read it
 
     char *buffer;
-    recv_wrapper(socket_file_descriptor, buffer);
+    recv_wrapper(socket_file_descriptor, &buffer);
 
     printf("client: opt 5 result: '%s'\n", buffer);
     free(buffer);
@@ -212,7 +224,7 @@ void opt_get_profiles(int socket_file_descriptor) {
 
 // (6) dado o email de um perfil, retornar suas informações
 void opt_get_profile(int socket_file_descriptor) {
-    send(socket_file_descriptor, "6", 1, SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, "6");
 
     int return_value;
     char input_buffer[60]; // email length <= 58
@@ -221,7 +233,7 @@ void opt_get_profile(int socket_file_descriptor) {
     if (_validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
 
-    send(socket_file_descriptor, input_buffer, sizeof(input_buffer), SEND_NO_FLAGS);
+    send_wrapper(socket_file_descriptor, input_buffer);
 }
 
 void print_options_list(int socket_file_descriptor) {
