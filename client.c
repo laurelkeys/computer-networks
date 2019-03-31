@@ -45,7 +45,7 @@ void receive_message(int socket_file_descriptor) {
 
 void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor) {
     // receive_message(socket_file_descriptor);
-    send_wrapper(socket_file_descriptor, "Hello from client!");
+    // send_wrapper(socket_file_descriptor, "Hello from client!");
 
     int option;
     int quit = 0;

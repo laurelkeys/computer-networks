@@ -8,9 +8,6 @@ int current_opt = 0;
 int main(void) {
     init_db();
 
-    // opt_get_profiles();
-    // exit(0);
-
     struct addrinfo *server_addrinfo;
     get_server_addrinfo(NULL, PORT, &server_addrinfo);
 
@@ -55,11 +52,6 @@ int main(void) {
         if (!fork()) { // this is the child process
             close(socket_file_descriptor); // child doesn't need the listener
 
-            int bytes_left = send_wrapper(new_file_descriptor, "Server Hello");
-            printf("Hello bytes_left: %d\n", bytes_left);
-            // if (send(new_file_descriptor, "Hello, world!", 13, 0) == -1)
-            //     perror("send");
-
             receive_messages(new_file_descriptor);
 
             close(new_file_descriptor);
@@ -75,22 +67,15 @@ int main(void) {
 void receive_messages(int socket_file_descriptor) {
     int numbytes; // length of the message written to the buffer
     char *buffer;
+    char opt;
 
     while (1) {
-        // if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
-        //     perror("recv");
-        //     exit(1);
-        // }
-
-        // buffer[numbytes] = '\0';
         recv_wrapper(socket_file_descriptor, &buffer);
-        printf("recv_wrapper '%s'\n", buffer);
-        send_wrapper(socket_file_descriptor, "testeste");
+        printf("server: received from client '%s'\n", buffer);
+        opt = buffer[0];
         free(buffer);
-        continue;
-        // printf("client: received '%s'\n", buffer);
 
-        if (buffer[0] == OPT_QUIT_STR[0]) break; // FIXME
+        if (opt == OPT_QUIT_STR[0]) break; // FIXME
 
         switch (buffer[0] - '0') {
             case 1: _opt_get_profiles_filtering_education(socket_file_descriptor);
@@ -151,24 +136,24 @@ void _opt_get_experience_from_profile(int socket_file_descriptor) {
     // if (send(socket_file_descriptor, "opt selected: 4", 15, 0) == -1) perror("send");
 }
 
-void send_file_to_client(FILE *f) {  
+void send_file_to_client(int socket_file_descriptor, FILE *f) {  
     fseek(f, 0, SEEK_END);
     long file_size = ftell(f);
     fseek(f, 0, SEEK_SET);
     printf("file size: %ld\n", file_size);
 
-
+    // TODO send file with send_wrapper
 }
 
 // FIXME
 void _opt_get_profiles(int socket_file_descriptor) {
     printf("option selected: 5\n");
-    int bytes_left = send_wrapper(socket_file_descriptor, "opt selected: 5");
+    int bytes_left = send_wrapper(socket_file_descriptor, "I heard you like opt 5");
     printf("bytes_left: %d\n", bytes_left);
 
     // if (send(socket_file_descriptor, "opt selected: 5", 15, 0) == -1) perror("send");
     opt_get_profiles(); // queries database
-    send_file_to_client(fopen("result.txt", "r"));
+    send_file_to_client(socket_file_descriptor, fopen("result.txt", "r"));
 }
 
 void _opt_get_profile(int socket_file_descriptor) {
