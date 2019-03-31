@@ -32,6 +32,7 @@ int send_wrapper(int file_descriptor, char * message) {
     char buffer[msg_size];
     strcat(buffer, header);
     strcat(buffer, message);
+    free(header);
 
     int bytes_sent = 0; // how many bytes we've sent
     int bytes_left = msg_size; // how many we have left to send
@@ -66,11 +67,4 @@ int recv_wrapper(int file_descriptor, char * buffer) {
         bytes_received += n;
     }
     return msg_size-bytes_received;
-}
-
-int main(void) {
-    char * str = msg_size_to_str(12345678);
-    printf("%s\n", str);
-    int size = msg_size_to_int("00012345678;");
-    printf("%d\n", size);
 }

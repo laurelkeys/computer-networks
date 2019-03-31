@@ -1,5 +1,5 @@
-#ifndef LIBS_H
-#define LIBS_H
+#ifndef _LIBS_H_
+#define _LIBS_H_
 
 #include <stdio.h>
 #include <stdlib.h>

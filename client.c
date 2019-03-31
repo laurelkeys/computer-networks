@@ -203,17 +203,11 @@ void opt_get_profiles(int socket_file_descriptor) {
     // int file_size;
     // TODO get response size and read it
 
-    int numbytes;
-    char buffer[MAXDATASIZE];
-
-    if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
-        perror("recv");
-        exit(1);
-    }
-
-    buffer[numbytes] = '\0';
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, buffer);
 
     printf("client: received '%s'\n", buffer);
+    free(buffer);
 }
 
 // (6) dado o email de um perfil, retornar suas informações
