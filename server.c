@@ -178,18 +178,12 @@ void opt_get_experience_from_profile(char *email) {
 }
 
 void opt_get_profiles() {
-    // char *sql = 
-    //     "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skill.skill, Experience.experience "
-    //     "FROM Profile "
-    //     "INNER JOIN Skill ON Skill.email = Profile.email "
-    //     "INNER JOIN Experience ON Experience.email = Profile.email;";
-
     char *sql = 
         "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
         "FROM Profile "
-        "INNER JOIN (SELECT Profile.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Profile INNER JOIN Skill ON Skill.email = Profile.email GROUP BY Profile.email) AS Skills "
+        "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
         "ON Profile.email = Skills.email "
-        "INNER JOIN (SELECT Profile.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Profile INNER JOIN Experience ON Experience.email = Profile.email GROUP BY Profile.email) AS Experiences "
+        "INNER JOIN (SELECT Experience.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Experience GROUP BY Experience.email) AS Experiences "
         "ON Profile.email = Experiences.email "
         "GROUP BY Profile.email;";
     execute_sql(sql);
