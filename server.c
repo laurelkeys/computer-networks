@@ -143,13 +143,19 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     printf("file size: %ld\n", file_size);
 
     // TODO send file with send_wrapper
+    char text[file_size+1];
+    char buffer[file_size+1];
+    while (fgets(buffer,file_size,f)) strcat(text,buffer);
+    text[file_size] = '\0';
+    printf("send_file_to_client: '%s'\n", text);
+    send_wrapper(socket_file_descriptor, text);
 }
 
 // FIXME
 void _opt_get_profiles(int socket_file_descriptor) {
     printf("option selected: 5\n");
-    int bytes_left = send_wrapper(socket_file_descriptor, "I heard you like opt 5");
-    printf("bytes_left: %d\n", bytes_left);
+    // int bytes_left = send_wrapper(socket_file_descriptor, "I heard you like opt 5");
+    // printf("bytes_left: %d\n", bytes_left);
 
     // if (send(socket_file_descriptor, "opt selected: 5", 15, 0) == -1) perror("send");
     opt_get_profiles(); // queries database

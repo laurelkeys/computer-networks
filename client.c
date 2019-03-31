@@ -224,7 +224,7 @@ void opt_get_profile(int socket_file_descriptor) {
     send_wrapper(socket_file_descriptor, input_buffer);
 }
 
-void print_options_list(int socket_file_descriptor) {
+void print_options_list() {
     printf("Escolha uma das seguintes opções:\n");
 
     printf("(1) listar todas as pessoas formadas em um determinado curso;\n");
