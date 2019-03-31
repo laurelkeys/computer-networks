@@ -280,10 +280,19 @@ int send_info_callback(void *not_used, int length, char **column_content, char *
     // TODO send queried info to client
     FILE *f;
     f = fopen("results.txt", "w"); // TODO change to write "w" and append in client
-    fprintf(f, "------ %d ------\n", current_opt);
+    fprintf(f, "\n");
     char buffer[512];
     for (int i = 0; i < length; i++) {
         snprintf(buffer, sizeof(buffer), "%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");
+
+        int line_size = 0;
+        char ch = ' ';
+        while (ch != '\n' && line_size < 512) {
+            ch = buffer[line_size++];
+        }
+        printf("line size: %d\n", line_size + 1); // + 1 because of the first '\n' added
+
+
         printf("%s", buffer);
         fprintf(f, "%s", buffer);
     }
