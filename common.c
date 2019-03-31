@@ -34,7 +34,10 @@ int send_wrapper(int file_descriptor, char * message) {
 int recv_wrapper(int file_descriptor, char * buffer) {
     char header_buffer[HEADER_SIZE];
     recv(file_descriptor, header_buffer, HEADER_SIZE, 0);
+    int msg_size = msg_size_to_int(header_buffer);
 
+    buffer = malloc(sizeof(char)*msg_size);
+    recv(file_descriptor, buffer, msg_size, 0);
     return 0;
 }
 
