@@ -1,6 +1,6 @@
 CC			= gcc
 SOURCES		= $(shell find . -maxdepth 1 -name '*.c')
-EXECS		= $(SOURCES:.c=)
+EXECS		= client server
 OBJS		= $(SOURCES:.c=.o)
 CFLAGS		= -g
 LDFLAGS		= -lsqlite3
@@ -18,7 +18,7 @@ all: $(EXECS)
 clean:
 	rm -f $(OBJS) $(EXECS)
 
-client: client.o
+client: client.o common.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
 server: server.o

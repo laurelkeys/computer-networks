@@ -32,6 +32,8 @@
 #define SEND_NO_FLAGS 0
 #define OPT_QUIT_STR "7"
 
+#include "common.h"
+
 typedef struct profile {
     char *email;
     char *name;
