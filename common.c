@@ -19,8 +19,8 @@ char* msg_size_to_str(int size) {
 
 int msg_size_to_int(char * size) {
     int result = 0;
-    for (int i = 0; i < HEADER_SIZE-1; i++) {
-        if (*(size + i) != '\0') {
+    for (int i = 0; i < HEADER_SIZE-2; i++) {
+        if (*(size + i) != '\0' && *(size + i) != ';') {
             result *= 10;
             result += *(size + i) - '0';
         }
@@ -75,6 +75,7 @@ int recv_wrapper(int file_descriptor, char **buffer) {
 
     if (header_buffer[HEADER_SIZE-2] != ';') perror("Header ending not found");
     int msg_size = msg_size_to_int(header_buffer);
+    printf("msg_size: %d\n", msg_size);
 
     *buffer = malloc(sizeof(char*)*msg_size);
     bytes_received = 0;
@@ -83,8 +84,13 @@ int recv_wrapper(int file_descriptor, char **buffer) {
         if (n == -1) { 
             perror("common: msg recv");
             break; 
+        } else if (n <= 0) {
+            perror("common: n <= 0");
+            break; 
         }
+        printf("n: %d\n", n);
         bytes_received += n;
+        printf("bytes_received: %d\n", bytes_received);
     }
     printf("buffer: %s\n", *buffer);
     return msg_size-bytes_received;

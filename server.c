@@ -85,6 +85,7 @@ void receive_messages(int socket_file_descriptor) {
         // buffer[numbytes] = '\0';
         recv_wrapper(socket_file_descriptor, &buffer);
         printf("recv_wrapper '%s'\n", buffer);
+        send_wrapper(socket_file_descriptor, "testeste");
         free(buffer);
         continue;
         // printf("client: received '%s'\n", buffer);

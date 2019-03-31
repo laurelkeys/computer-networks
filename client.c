@@ -22,18 +22,6 @@ int main(int argc, char *argv[]) {
     connect_to_first_match(server_addrinfo, &socket_file_descriptor, &connected_addrinfo);
     freeaddrinfo(server_addrinfo);
 
-    // FIXME delete
-    send_wrapper(socket_file_descriptor, "Hello!!");
-    send_wrapper(socket_file_descriptor, "How are you today m@t3??");
-    send_wrapper(socket_file_descriptor, "test1nG s^om'e cháràctérzZ..");
-
-    char *buffer;
-    recv_wrapper(socket_file_descriptor, &buffer);
-    printf("recv_wrapper: '%s'\n", buffer);
-    free(buffer);
-
-    exit(0);
-
     // does the work ;)
     just_do_it(connected_addrinfo, socket_file_descriptor);
 
