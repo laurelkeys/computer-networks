@@ -8,8 +8,8 @@ int current_opt = 0;
 int main(void) {
     init_db();
 
-    opt_get_profiles();
-    exit(0);
+    // opt_get_profiles();
+    // exit(0);
 
     struct addrinfo *server_addrinfo;
     get_server_addrinfo(NULL, PORT, &server_addrinfo);
@@ -127,26 +127,43 @@ void *get_in_addr(struct sockaddr *sa) {
 
 void _opt_get_profiles_filtering_education(int socket_file_descriptor) {
     printf("option selected: 1\n");
+    if (send(socket_file_descriptor, "opt selected: 1", 15, 0) == -1) perror("send");
 }
 
 void _opt_get_skills_filtering_city(int socket_file_descriptor) {
     printf("option selected: 2\n");
+    if (send(socket_file_descriptor, "opt selected: 2", 15, 0) == -1) perror("send");
 }
 
 void _opt_add_skill_to_profile(int socket_file_descriptor) {
     printf("option selected: 3\n");
+    if (send(socket_file_descriptor, "opt selected: 3", 15, 0) == -1) perror("send");
 }
 
 void _opt_get_experience_from_profile(int socket_file_descriptor) {
     printf("option selected: 4\n");
+    if (send(socket_file_descriptor, "opt selected: 4", 15, 0) == -1) perror("send");
+}
+
+void send_file_to_client(FILE *f) {  
+    fseek(f, 0, SEEK_END);
+    long file_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    printf("file size: %ld\n", file_size);
+
+
 }
 
 void _opt_get_profiles(int socket_file_descriptor) {
     printf("option selected: 5\n");
+    if (send(socket_file_descriptor, "opt selected: 5", 15, 0) == -1) perror("send");
+    opt_get_profiles(); // queries database
+    send_file_to_client(fopen("result.txt", "r"));
 }
 
 void _opt_get_profile(int socket_file_descriptor) {
     printf("option selected: 6\n");
+    if (send(socket_file_descriptor, "opt selected: 6", 15, 0) == -1) perror("send");
 }
 
 void opt_get_profiles_filtering_education(char *education) {
@@ -258,6 +275,7 @@ void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_desc
 
 void execute_sql(char *sql) {
     char *err_msg = 0;
+    fclose(fopen("result.txt", "w"));
     if (sqlite3_exec(db, sql, send_info_callback, 0, &err_msg) != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);        
@@ -271,16 +289,11 @@ void exit_cleanup() {
     sqlite3_close(db);
 }
 
-void send_file_to_client() {
-
-}
-
 int send_info_callback(void *not_used, int length, char **column_content, char **column_name) {
-    printf("\nCallback\n");
-    // TODO send queried info to client
+    printf("\nCallback from opt %d\n", current_opt);
+
     FILE *f;
-    f = fopen("results.txt", "w"); // TODO change to write "w" and append in client
-    fprintf(f, "\n");
+    f = fopen("result.txt", "a");
     char buffer[512];
     for (int i = 0; i < length; i++) {
         snprintf(buffer, sizeof(buffer), "%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");
@@ -290,19 +303,14 @@ int send_info_callback(void *not_used, int length, char **column_content, char *
         while (ch != '\n' && line_size < 512) {
             ch = buffer[line_size++];
         }
-        printf("line size: %d\n", line_size + 1); // + 1 because of the first '\n' added
+        printf("line size: %d\n", line_size);
 
 
         printf("%s", buffer);
         fprintf(f, "%s", buffer);
     }
-    send_file_to_client(f);
-  
-    fseek(f, 0, SEEK_END);
-    long file_size = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    printf("file size: %ld\n", file_size);
-  
+
+    fprintf(f, "\n");  
     fclose(f);
     return 0;
 }

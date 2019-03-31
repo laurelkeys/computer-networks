@@ -82,7 +82,7 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
                 break;
         }
 
-        send(socket_file_descriptor, "OPT_END", 7, SEND_NO_FLAGS);
+        // end of option, loops to allow a new one
     }
 
     printf("          / )\n");
@@ -199,6 +199,21 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
 // (5) listar todas as informações de todos os perfis
 void opt_get_profiles(int socket_file_descriptor) {
     send(socket_file_descriptor, "5", 1, SEND_NO_FLAGS);
+
+    // int file_size;
+    // TODO get response size and read it
+
+    int numbytes;
+    char buffer[MAXDATASIZE];
+
+    if ((numbytes = recv(socket_file_descriptor, buffer, MAXDATASIZE-1, 0)) == -1) {
+        perror("recv");
+        exit(1);
+    }
+
+    buffer[numbytes] = '\0';
+
+    printf("client: received '%s'\n", buffer);
 }
 
 // (6) dado o email de um perfil, retornar suas informações
