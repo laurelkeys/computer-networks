@@ -37,7 +37,7 @@ int send_wrapper(int file_descriptor, char * message) {
     int bytes_left = msg_size; // how many we have left to send
     int n;
     while (bytes_sent < msg_size) {
-        n = send(file_descriptor, message+bytes_sent, bytes_left, 0);
+        n = send(file_descriptor, buffer+bytes_sent, bytes_left, 0);
         if (n == -1) { break; }
         bytes_sent += n;
         bytes_left -= n;
