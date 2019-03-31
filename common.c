@@ -39,7 +39,10 @@ int send_wrapper(int file_descriptor, char * message) {
     int n;
     while (bytes_sent < msg_size) {
         n = send(file_descriptor, buffer+bytes_sent, bytes_left, 0);
-        if (n == -1) { break; }
+        if (n == -1) { 
+            perror("common: send");
+            break; 
+        }
         bytes_sent += n;
         bytes_left -= n;
     }
@@ -53,7 +56,10 @@ int recv_wrapper(int file_descriptor, char * buffer) {
     int n;
     while (bytes_received < HEADER_SIZE) {
         n = recv(file_descriptor, header_buffer+bytes_received, HEADER_SIZE-bytes_received, 0);
-        if (n == -1) { break; }
+        if (n == -1) { 
+            perror("common: header recv");
+            break;
+        }
         bytes_received += n;
     }
     if (header_buffer[HEADER_SIZE-1] != ';') perror("Header ending not found");
@@ -63,7 +69,10 @@ int recv_wrapper(int file_descriptor, char * buffer) {
     bytes_received = 0;
     while (bytes_received < msg_size) {
         n = recv(file_descriptor, buffer+bytes_received, msg_size-bytes_received, 0);
-        if (n == -1) { break; }
+        if (n == -1) { 
+            perror("common: msg recv");
+            break; 
+        }
         bytes_received += n;
     }
     return msg_size-bytes_received;

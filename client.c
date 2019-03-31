@@ -206,7 +206,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     char *buffer;
     recv_wrapper(socket_file_descriptor, buffer);
 
-    printf("client: received '%s'\n", buffer);
+    printf("client: opt 5 result: '%s'\n", buffer);
     free(buffer);
 }
 

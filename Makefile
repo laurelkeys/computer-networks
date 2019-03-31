@@ -21,5 +21,5 @@ clean:
 client: client.o common.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
-server: server.o
+server: server.o common.o
 	$(CC) $^ $(LDFLAGS) -o $@
