@@ -77,7 +77,7 @@ void receive_messages(int socket_file_descriptor) {
 
         if (opt == OPT_QUIT_STR[0]) break; // FIXME
 
-        switch (buffer[0] - '0') {
+        switch (opt - '0') {
             case 1: _opt_get_profiles_filtering_education(socket_file_descriptor);
             break;
             case 2: _opt_get_skills_filtering_city(socket_file_descriptor);
@@ -147,7 +147,7 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     char buffer[file_size+1];
     while (fgets(buffer,file_size,f)) strcat(text,buffer);
     text[file_size] = '\0';
-    printf("send_file_to_client: '%s'\n", text);
+    printf("send_file_to_client: \n'''%s'''\n", text);
     send_wrapper(socket_file_descriptor, text);
 }
 
@@ -298,15 +298,6 @@ int send_info_callback(void *not_used, int length, char **column_content, char *
     char buffer[512];
     for (int i = 0; i < length; i++) {
         snprintf(buffer, sizeof(buffer), "%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");
-
-        int line_size = 0;
-        char ch = ' ';
-        while (ch != '\n' && line_size < 512) {
-            ch = buffer[line_size++];
-        }
-        printf("line size: %d\n", line_size);
-
-
         printf("%s", buffer);
         fprintf(f, "%s", buffer);
     }
