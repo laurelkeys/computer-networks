@@ -3,8 +3,13 @@
 sqlite3 *db;
 sqlite3_stmt *res;
 
+int current_opt = 0;
+
 int main(void) {
     init_db();
+
+    opt_get_profiles();
+    exit(0);
 
     struct addrinfo *server_addrinfo;
     get_server_addrinfo(NULL, PORT, &server_addrinfo);
@@ -145,6 +150,7 @@ void _opt_get_profile(int socket_file_descriptor) {
 }
 
 void opt_get_profiles_filtering_education(char *education) {
+    current_opt = 1;
     char sql[46+strlen(education)];
     char *sql_part = "SELECT name FROM Profile WHERE education = '%s'";
     sprintf(sql, sql_part, education);
@@ -152,6 +158,7 @@ void opt_get_profiles_filtering_education(char *education) {
 }
 
 void opt_get_skills_filtering_city(char *city) {
+    current_opt = 2;
     char sql[119+strlen(city)];
     char *sql_part = "SELECT Profile.name, Skill.skill FROM Profile INNER JOIN Skill ON Skill.email = Profile.email WHERE Profile.city = '%s'";
     sprintf(sql, sql_part, city);
@@ -159,6 +166,7 @@ void opt_get_skills_filtering_city(char *city) {
 }
 
 void opt_add_skill_to_profile(char *email, char *skill) {
+    current_opt = 3;
     char sql[35+strlen(email)+strlen(skill)];
     char *sql_part = "INSERT INTO Skill VALUES('%s','%s')";
     sprintf(sql, sql_part, email, skill);
@@ -166,6 +174,7 @@ void opt_add_skill_to_profile(char *email, char *skill) {
 }
 
 void opt_get_experience_from_profile(char *email) {
+    current_opt = 4;
     char sql[119+strlen(email)];
     char *sql_part = "SELECT experience FROM Experience WHERE email = '%s'";
     sprintf(sql, sql_part, email);
@@ -173,6 +182,7 @@ void opt_get_experience_from_profile(char *email) {
 }
 
 void opt_get_profiles() {
+    current_opt = 5;
     char *sql = 
         "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
         "FROM Profile "
@@ -185,6 +195,7 @@ void opt_get_profiles() {
 }
 
 void opt_get_profile(char *email) {
+    current_opt = 6;
     char sql[500+strlen(email)];
     char *sql_part = 
         "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
@@ -260,12 +271,30 @@ void exit_cleanup() {
     sqlite3_close(db);
 }
 
+void send_file_to_client() {
+
+}
+
 int send_info_callback(void *not_used, int length, char **column_content, char **column_name) {
     printf("\nCallback\n");
     // TODO send queried info to client
+    FILE *f;
+    f = fopen("results.txt", "w"); // TODO change to write "w" and append in client
+    fprintf(f, "------ %d ------\n", current_opt);
+    char buffer[512];
     for (int i = 0; i < length; i++) {
-        printf("%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");
+        snprintf(buffer, sizeof(buffer), "%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");
+        printf("%s", buffer);
+        fprintf(f, "%s", buffer);
     }
+    send_file_to_client(f);
+  
+    fseek(f, 0, SEEK_END);
+    long file_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    printf("file size: %ld\n", file_size);
+  
+    fclose(f);
     return 0;
 }
 
