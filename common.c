@@ -48,12 +48,24 @@ int send_wrapper(int file_descriptor, char * message) {
 
 int recv_wrapper(int file_descriptor, char * buffer) {
     char header_buffer[HEADER_SIZE];
-    recv(file_descriptor, header_buffer, HEADER_SIZE, 0);
+    int bytes_received = 0;
+    int n;
+    while (bytes_received < HEADER_SIZE) {
+        n = recv(file_descriptor, header_buffer+bytes_received, HEADER_SIZE-bytes_received, 0);
+        if (n == -1) { break; }
+        bytes_received += n;
+    }
+    if (header_buffer[HEADER_SIZE-1] != ';') perror("Header ending not found");
     int msg_size = msg_size_to_int(header_buffer);
 
     buffer = malloc(sizeof(char)*msg_size);
-    recv(file_descriptor, buffer, msg_size, 0);
-    return 0;
+    bytes_received = 0;
+    while (bytes_received < msg_size) {
+        n = recv(file_descriptor, buffer+bytes_received, msg_size-bytes_received, 0);
+        if (n == -1) { break; }
+        bytes_received += n;
+    }
+    return msg_size-bytes_received;
 }
 
 int main(void) {
