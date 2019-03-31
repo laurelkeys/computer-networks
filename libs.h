@@ -1,3 +1,6 @@
+#ifndef LIBS_H
+#define LIBS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -8,6 +11,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+
+#include "common.h"
 
 #ifndef PORT
 #define PORT "3490"  // the port users will be connecting to
@@ -37,3 +42,5 @@ typedef struct profile {
     char **skills; // array of strings
     char **prior_experience; // array of strings
 } profile;
+
+#endif
