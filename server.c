@@ -3,43 +3,6 @@
 sqlite3 *db;
 sqlite3_stmt *res;
 
-void profile_skills() {
-    char *sql = 
-        "SELECT Profile.email, GROUP_CONCAT(Skill.skill, ', ') AS skills "
-        "FROM Profile "
-        "INNER JOIN Skill ON Skill.email = Profile.email "
-        "GROUP BY Profile.email;";
-    execute_sql(sql);
-}
-
-void profile_experiences() {
-    char *sql = 
-        "SELECT Profile.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences "
-        "FROM Profile "
-        "INNER JOIN Experience ON Experience.email = Profile.email "
-        "GROUP BY Profile.email;";
-    execute_sql(sql);
-}
-
-void profiles() {
-    char *sql = 
-        "SELECT Profile.email, Profile.name "
-        "FROM Profile;";
-    execute_sql(sql);
-}
-
-void join() {
-    char *sql = 
-        "SELECT Profile.name, Skills.skills, Experiences.experiences "
-        "FROM Profile "
-        "INNER JOIN (SELECT Profile.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Profile INNER JOIN Skill ON Skill.email = Profile.email GROUP BY Profile.email) AS Skills "
-        "ON Profile.email = Skills.email "
-        "INNER JOIN (SELECT Profile.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Profile INNER JOIN Experience ON Experience.email = Profile.email GROUP BY Profile.email) AS Experiences "
-        "ON Profile.email = Experiences.email "
-        "GROUP BY Profile.email;";
-    execute_sql(sql);
-}
-
 int main(void) {
     init_db();
 
