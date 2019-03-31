@@ -35,7 +35,7 @@ int send_wrapper(int file_descriptor, char * message) {
     char *header = msg_size_to_str(msg_size);    
     printf("send_wrapper: header: %s\n", header);
     
-    msg_size += HEADER_SIZE;
+    msg_size += HEADER_SIZE-1;
     printf("send_wrapper: msg_size: %d\n", msg_size);
 
     char buffer[msg_size];
@@ -77,13 +77,14 @@ int recv_wrapper(int file_descriptor, char **buffer) {
         }
         bytes_received += n;
     }
+    header_buffer[HEADER_SIZE-1] = '\0';
     printf("recv_wrapper: header_buffer: %s\n", header_buffer);
 
     if (header_buffer[HEADER_SIZE-2] != ';') perror("Header ending not found");
     int msg_size = msg_size_to_int(header_buffer);
     printf("recv_wrapper: msg_size: %d\n", msg_size);
 
-    *buffer = malloc(sizeof(char*)*msg_size);
+    *buffer = malloc(sizeof(char*)*(msg_size+1));
     bytes_received = 0;
     while (bytes_received < msg_size) {
         n = recv(file_descriptor, (*buffer)+bytes_received, msg_size-bytes_received, 0);
@@ -98,6 +99,7 @@ int recv_wrapper(int file_descriptor, char **buffer) {
         bytes_received += n;
         printf("recv_wrapper: bytes_received: %d\n", bytes_received);
     }
+    (*buffer)[msg_size] = '\0';
     printf("recv_wrapper: buffer: %s\n", *buffer);
     return msg_size-bytes_received;
 }
