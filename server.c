@@ -6,11 +6,6 @@ sqlite3_stmt *res;
 int main(void) {
     init_db();
 
-    //
-    opt_get_profiles();
-    exit(0);
-    //
-
     struct addrinfo *server_addrinfo;
     get_server_addrinfo(NULL, PORT, &server_addrinfo);
 
@@ -126,27 +121,27 @@ void *get_in_addr(struct sockaddr *sa) {
 // OPTIONS //////////////////////////////
 
 void _opt_get_profiles_filtering_education(int socket_file_descriptor) {
-
+    printf("option selected: 1\n");
 }
 
 void _opt_get_skills_filtering_city(int socket_file_descriptor) {
-
+    printf("option selected: 2\n");
 }
 
 void _opt_add_skill_to_profile(int socket_file_descriptor) {
-
+    printf("option selected: 3\n");
 }
 
 void _opt_get_experience_from_profile(int socket_file_descriptor) {
-
+    printf("option selected: 4\n");
 }
 
 void _opt_get_profiles(int socket_file_descriptor) {
-
+    printf("option selected: 5\n");
 }
 
 void _opt_get_profile(int socket_file_descriptor) {
-
+    printf("option selected: 6\n");
 }
 
 void opt_get_profiles_filtering_education(char *education) {
@@ -190,12 +185,14 @@ void opt_get_profiles() {
 }
 
 void opt_get_profile(char *email) {
-    char sql[287+strlen(email)];
+    char sql[500+strlen(email)];
     char *sql_part = 
-        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skill.skill, Experience.experience "
+        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
         "FROM Profile "
-        "INNER JOIN Skill ON Skill.email = Profile.email "
-        "INNER JOIN Experience ON Experience.email = Profile.email "
+        "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
+        "ON Profile.email = Skills.email "
+        "INNER JOIN (SELECT Experience.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Experience GROUP BY Experience.email) AS Experiences "
+        "ON Profile.email = Experiences.email "
         "WHERE Profile.email = '%s';";
     sprintf(sql, sql_part, email);
     execute_sql(sql);
