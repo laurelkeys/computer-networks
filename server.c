@@ -69,6 +69,7 @@ void receive_messages(int socket_file_descriptor) {
     int numbytes; // length of the message written to the buffer
     char *buffer;
     char opt;
+    struct timeval tv3, tv4;
 
     while (true) {
         recv_wrapper(socket_file_descriptor, &buffer, v);
@@ -78,6 +79,7 @@ void receive_messages(int socket_file_descriptor) {
 
         if (opt == OPT_QUIT_STR[0]) break; // FIXME
 
+        gettimeofday(&tv3, NULL);
         switch (opt - '0') {
             case 1: opt_get_profiles_filtering_education(socket_file_descriptor);
             break;
@@ -92,6 +94,8 @@ void receive_messages(int socket_file_descriptor) {
             case 6: opt_get_profile(socket_file_descriptor);
             break;
         }
+        gettimeofday(&tv4, NULL);
+        printf("TEMPO DE PROCESSAMENTO: %ldus\n", tv4.tv_usec-tv3.tv_usec);
     }
 }
 

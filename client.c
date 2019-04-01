@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
 
 void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor) {
     int option;
+    struct timeval tv1, tv2;
     bool quit = false;
     while (!quit) {
         print_options_list();
@@ -41,6 +42,7 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
 
         option = (option >= 1 && option <= 6) ? option : 7;
         printf("\n-- (%d) --\n", option);
+        gettimeofday(&tv1, NULL);
         switch (option) {
             case 1: opt_get_profiles_filtering_education(socket_file_descriptor);
             break;
@@ -59,6 +61,8 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
                 quit = true;
                 break;
         } // end of option, loops to allow a new one
+        gettimeofday(&tv2, NULL);
+        printf("TEMPO TOTAL: %ldus\n", tv2.tv_usec-tv1.tv_usec);
     }
 
     printf("          / )\n");
@@ -171,6 +175,7 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
 
     char *buffer;
 
+    /* TODO send 'success' message from the server
     // Print result
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("\n%s\n", buffer);
@@ -180,6 +185,7 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
     snprintf(header, sizeof(header), "--> (3) email: %s, habilidade: %s\n", input_buffer_email, input_buffer_skill);
     save_result_to_file(header, buffer);
     free(buffer);
+    */
 }
 
 void opt_get_experience_from_profile(int socket_file_descriptor) {

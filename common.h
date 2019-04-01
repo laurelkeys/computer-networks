@@ -1,6 +1,7 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#include <sys/time.h>
 #include "libs.h"
 
 #define HEADER_SIZE 12 + 1 // + 1 to add '\0'
