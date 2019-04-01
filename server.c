@@ -185,6 +185,15 @@ void _opt_add_skill_to_profile(int socket_file_descriptor) {
 void _opt_get_experience_from_profile(int socket_file_descriptor) {
     printf("option selected: 4\n");
     // if (send(socket_file_descriptor, "opt selected: 4", 15, 0) == -1) perror("send");
+
+    char *email;
+    recv_wrapper(socket_file_descriptor, &email, v);
+    printf("server: email '%s'\n", email);
+
+    opt_get_experience_from_profile(email); // queries database
+    free(email);
+
+    send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
 }
 
 // FIXME
