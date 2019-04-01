@@ -103,6 +103,14 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
 
     printf ("Curso escolhido: '%s'\n\n", input_buffer);
     send_wrapper(socket_file_descriptor, input_buffer, v);
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("%s\n", buffer); // prints the received result
+
+    save_result_to_file("-- 5 --\n", buffer);
+    
+    free(buffer);
 }
 
 void opt_get_skills_filtering_city(int socket_file_descriptor) {

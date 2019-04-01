@@ -117,9 +117,36 @@ void *get_in_addr(struct sockaddr *sa) {
 
 // OPTIONS //////////////////////////////
 
+void send_file_to_client(int socket_file_descriptor, FILE *f) {  
+    fseek(f, 0, SEEK_END);
+    long file_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    printf("file size: %ld\n", file_size);
+
+    // TODO send file with send_wrapper
+    char text[file_size+1];
+    text[0] = '\0';
+    char buffer[file_size+1];
+    printf("send_file_to_client - before: \n'''%s'''\n", text);
+    while (fgets(buffer,file_size,f)) strcat(text,buffer);
+    text[file_size] = '\0';
+    printf("send_file_to_client: \n'''%s'''\n", text);
+    send_wrapper(socket_file_descriptor, text, v);
+    fclose(f);
+}
+
 void _opt_get_profiles_filtering_education(int socket_file_descriptor) {
     printf("option selected: 1\n");
     // if (send(socket_file_descriptor, "opt selected: 1", 15, 0) == -1) perror("send");
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("server: education '%s'\n", buffer);
+
+    opt_get_profiles_filtering_education(buffer); // queries database
+    free(buffer);
+
+    send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
 }
 
 void _opt_get_skills_filtering_city(int socket_file_descriptor) {
@@ -135,21 +162,6 @@ void _opt_add_skill_to_profile(int socket_file_descriptor) {
 void _opt_get_experience_from_profile(int socket_file_descriptor) {
     printf("option selected: 4\n");
     // if (send(socket_file_descriptor, "opt selected: 4", 15, 0) == -1) perror("send");
-}
-
-void send_file_to_client(int socket_file_descriptor, FILE *f) {  
-    fseek(f, 0, SEEK_END);
-    long file_size = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    printf("file size: %ld\n", file_size);
-
-    // TODO send file with send_wrapper
-    char text[file_size+1];
-    char buffer[file_size+1];
-    while (fgets(buffer,file_size,f)) strcat(text,buffer);
-    text[file_size] = '\0';
-    printf("send_file_to_client: \n'''%s'''\n", text);
-    send_wrapper(socket_file_descriptor, text, v);
 }
 
 // FIXME
@@ -325,8 +337,8 @@ void init_db() {
         "CREATE TABLE Experience(email TEXT, experience TEXT, PRIMARY KEY (email, experience));"
         
         "INSERT INTO Profile VALUES('uno@mail.com','Uno','Dos','Campinas','Linguistics');" 
-        "INSERT INTO Profile VALUES('tres@mail.com','Tres','Cuatro','Campinas','Computer Science');" 
-        "INSERT INTO Profile VALUES('cinco@mail.com','Cinco','Seis','Seattle','Computer Engineering');" 
+        "INSERT INTO Profile VALUES('tres@mail.com','Tres','Cuatro','Campinas','CS');" 
+        "INSERT INTO Profile VALUES('cinco@mail.com','Cinco','Seis','Seattle','CS');" 
         
         "INSERT INTO Skill VALUES('uno@mail.com','Acoustic Engineering');" 
         "INSERT INTO Skill VALUES('uno@mail.com','English');" 
