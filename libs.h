@@ -31,7 +31,7 @@
 #define OPT_QUIT_STR "7"
 
 #define FILE_CLIENT "option_results.txt"
-#define FILE_SERVER "result.txt"
+#define FILE_SERVER "last_query_result.txt"
 
 typedef enum { false, true } bool;
 

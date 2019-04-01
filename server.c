@@ -79,17 +79,17 @@ void receive_messages(int socket_file_descriptor) {
         if (opt == OPT_QUIT_STR[0]) break; // FIXME
 
         switch (opt - '0') {
-            case 1: _opt_get_profiles_filtering_education(socket_file_descriptor);
+            case 1: opt_get_profiles_filtering_education(socket_file_descriptor);
             break;
-            case 2: _opt_get_skills_filtering_city(socket_file_descriptor);
+            case 2: opt_get_skills_filtering_city(socket_file_descriptor);
             break;
-            case 3: _opt_add_skill_to_profile(socket_file_descriptor);
+            case 3: opt_add_skill_to_profile(socket_file_descriptor);
             break;
-            case 4: _opt_get_experience_from_profile(socket_file_descriptor);
+            case 4: opt_get_experience_from_profile(socket_file_descriptor);
             break;
-            case 5: _opt_get_profiles(socket_file_descriptor);
+            case 5: opt_get_profiles(socket_file_descriptor);
             break;
-            case 6: _opt_get_profile(socket_file_descriptor);
+            case 6: opt_get_profile(socket_file_descriptor);
             break;
         }
     }
@@ -116,7 +116,7 @@ void *get_in_addr(struct sockaddr *sa) {
 
 // OPTIONS //////////////////////////////
 
-void send_file_to_client(int socket_file_descriptor, FILE *f) {  
+void send_file_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_END);
     long file_size = ftell(f);
     fseek(f, 0, SEEK_SET);
@@ -124,107 +124,63 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
 
     char text[file_size + 1];
     char buffer[file_size + 1];
-    while (fgets(buffer,file_size,f)) strcat(text, buffer);
+    while (fgets(buffer, file_size, f)) {
+        printf("send_file_to_client: %s\n", buffer);
+        strcat(text, buffer);
+    }
     text[file_size] = '\0';
     
-    if (v) printf("send_file_to_client: \n'''%s'''\n", text);
+    if (v) printf("send_file_to_client: \n'''%s'''\n", text); // FIXME test for odd behaviour
     send_wrapper(socket_file_descriptor, text, v);
 }
 
-void _opt_get_profiles_filtering_education(int socket_file_descriptor) {
-    printf("option selected: 1\n");
-    // if (send(socket_file_descriptor, "opt selected: 1", 15, 0) == -1) perror("send");
+// FIXME
+void opt_get_profiles_filtering_education(int socket_file_descriptor) {
+    printf("server: client selected option 1:\n");
+    char *education_buffer;
+    recv_wrapper(socket_file_descriptor, &education_buffer, v);
+    if (v) printf("server: education_buffer: '%s'\n", education_buffer);
+
+    opt_get_profiles_filtering_education_sql(education_buffer); // queries database
+    free(education_buffer);
+
+    FILE *f = fopen(FILE_SERVER, "r");
+    if (f) {
+        send_file_to_client(socket_file_descriptor, f);
+        fclose(f);
+    }
 }
 
-void _opt_get_skills_filtering_city(int socket_file_descriptor) {
-    printf("option selected: 2\n");
+void opt_get_skills_filtering_city(int socket_file_descriptor) {
+    printf("server: client selected option 2:\n");
     // if (send(socket_file_descriptor, "opt selected: 2", 15, 0) == -1) perror("send");
 }
 
-void _opt_add_skill_to_profile(int socket_file_descriptor) {
-    printf("option selected: 3\n");
+void opt_add_skill_to_profile(int socket_file_descriptor) {
+    printf("server: client selected option 3:\n");
     // if (send(socket_file_descriptor, "opt selected: 3", 15, 0) == -1) perror("send");
 }
 
-void _opt_get_experience_from_profile(int socket_file_descriptor) {
-    printf("option selected: 4\n");
+void opt_get_experience_from_profile(int socket_file_descriptor) {
+    printf("server: client selected option 4:\n");
     // if (send(socket_file_descriptor, "opt selected: 4", 15, 0) == -1) perror("send");
 }
 
 // FIXME
-void _opt_get_profiles(int socket_file_descriptor) {
-    printf("option selected: 5\n");
-    // int bytes_left = send_wrapper(socket_file_descriptor, "I heard you like opt 5");
-    // printf("bytes_left: %d\n", bytes_left);
-
-    // if (send(socket_file_descriptor, "opt selected: 5", 15, 0) == -1) perror("send");
+void opt_get_profiles(int socket_file_descriptor) {
+    printf("server: client selected option 5:\n");
     opt_get_profiles_sql(); // queries database
-    send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
+
+    FILE *f = fopen(FILE_SERVER, "r");
+    if (f) {
+        send_file_to_client(socket_file_descriptor, f);
+        fclose(f);
+    }
 }
 
-void _opt_get_profile(int socket_file_descriptor) {
-    printf("option selected: 6\n");
+void opt_get_profile(int socket_file_descriptor) {
+    printf("server: client selected option 6:\n");
     // if (send(socket_file_descriptor, "opt selected: 6", 15, 0) == -1) perror("send");
-}
-
-void opt_get_profiles_filtering_education(char *education) {
-    current_opt = 1;
-    char sql[46+strlen(education)];
-    char *sql_part = "SELECT name FROM Profile WHERE education = '%s'";
-    sprintf(sql, sql_part, education);
-    execute_sql(sql);    
-}
-
-void opt_get_skills_filtering_city(char *city) {
-    current_opt = 2;
-    char sql[119+strlen(city)];
-    char *sql_part = "SELECT Profile.name, Skill.skill FROM Profile INNER JOIN Skill ON Skill.email = Profile.email WHERE Profile.city = '%s'";
-    sprintf(sql, sql_part, city);
-    execute_sql(sql);
-}
-
-void opt_add_skill_to_profile(char *email, char *skill) {
-    current_opt = 3;
-    char sql[35+strlen(email)+strlen(skill)];
-    char *sql_part = "INSERT INTO Skill VALUES('%s','%s')";
-    sprintf(sql, sql_part, email, skill);
-    execute_sql(sql);
-}
-
-void opt_get_experience_from_profile(char *email) {
-    current_opt = 4;
-    char sql[119+strlen(email)];
-    char *sql_part = "SELECT experience FROM Experience WHERE email = '%s'";
-    sprintf(sql, sql_part, email);
-    execute_sql(sql);
-}
-
-void opt_get_profiles_sql() {
-    current_opt = 5;
-    char *sql = 
-        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
-        "FROM Profile "
-        "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
-        "ON Profile.email = Skills.email "
-        "INNER JOIN (SELECT Experience.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Experience GROUP BY Experience.email) AS Experiences "
-        "ON Profile.email = Experiences.email "
-        "GROUP BY Profile.email;";
-    execute_sql(sql);
-}
-
-void opt_get_profile_sql(char *email) {
-    current_opt = 6;
-    char sql[500+strlen(email)];
-    char *sql_part = 
-        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
-        "FROM Profile "
-        "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
-        "ON Profile.email = Skills.email "
-        "INNER JOIN (SELECT Experience.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Experience GROUP BY Experience.email) AS Experiences "
-        "ON Profile.email = Experiences.email "
-        "WHERE Profile.email = '%s';";
-    sprintf(sql, sql_part, email);
-    execute_sql(sql);
 }
 
 // CONNECTION ///////////////////////////
@@ -276,8 +232,8 @@ void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_desc
 
 void execute_sql(char *sql) {
     char *err_msg = 0;
-    fclose(fopen(FILE_SERVER, "w"));
-    if (sqlite3_exec(db, sql, send_info_callback, 0, &err_msg) != SQLITE_OK ) {
+    fclose(fopen(FILE_SERVER, "w")); // rewrites FILE_SERVER with the latest query result
+    if (sqlite3_exec(db, sql, send_info_callback, 0, &err_msg) != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);        
         sqlite3_close(db);
@@ -291,7 +247,7 @@ void exit_cleanup() {
 }
 
 int send_info_callback(void *not_used, int length, char **column_content, char **column_name) {
-    printf("\nCallback from opt %d\n", current_opt);
+    if (v) printf("\nCallback from opt %d\n", current_opt);
 
     FILE *f;
     f = fopen(FILE_SERVER, "a");
@@ -305,6 +261,76 @@ int send_info_callback(void *not_used, int length, char **column_content, char *
     fprintf(f, "\n");
     fclose(f);
     return 0;
+}
+
+void opt_get_profiles_filtering_education_sql(char *education) {
+    current_opt = 1;
+    char *sql_part = "SELECT name FROM Profile WHERE education = '%s'";
+    char sql[strlen(sql_part) + strlen(education)];
+    
+    sprintf(sql, sql_part, education);
+    
+    execute_sql(sql);    
+}
+
+void opt_get_skills_filtering_city_sql(char *city) {
+    current_opt = 2;
+    char *sql_part = "SELECT Profile.name, Skill.skill FROM Profile INNER JOIN Skill ON Skill.email = Profile.email WHERE Profile.city = '%s'";
+    char sql[strlen(sql_part) + strlen(city)];
+    
+    sprintf(sql, sql_part, city);
+    
+    execute_sql(sql);
+}
+
+void opt_add_skill_to_profile_sql(char *email, char *skill) {
+    current_opt = 3;
+    char *sql_part = "INSERT INTO Skill VALUES('%s','%s')";
+    char sql[strlen(sql_part) + strlen(email) + strlen(skill)];
+    
+    sprintf(sql, sql_part, email, skill);
+    
+    execute_sql(sql);
+}
+
+void opt_get_experience_from_profile_sql(char *email) {
+    current_opt = 4;
+    char *sql_part = "SELECT experience FROM Experience WHERE email = '%s'";
+    char sql[strlen(sql_part) + strlen(email)];
+    
+    sprintf(sql, sql_part, email);
+    
+    execute_sql(sql);
+}
+
+void opt_get_profiles_sql() {
+    current_opt = 5;
+    char *sql = 
+        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
+        "FROM Profile "
+        "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
+        "ON Profile.email = Skills.email "
+        "INNER JOIN (SELECT Experience.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Experience GROUP BY Experience.email) AS Experiences "
+        "ON Profile.email = Experiences.email "
+        "GROUP BY Profile.email;";
+    execute_sql(sql);
+}
+
+void opt_get_profile_sql(char *email) {
+    current_opt = 6;
+    char *sql_part = 
+        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
+        "FROM Profile "
+        "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
+        "ON Profile.email = Skills.email "
+        "INNER JOIN (SELECT Experience.email, GROUP_CONCAT(Experience.experience, ', ') AS experiences FROM Experience GROUP BY Experience.email) AS Experiences "
+        "ON Profile.email = Experiences.email "
+        "WHERE Profile.email = '%s';";
+    char sql[strlen(sql_part) + strlen(email)];
+    
+    sprintf(sql, sql_part, email);
+    
+    execute_sql(sql);
 }
 
 void init_db() {

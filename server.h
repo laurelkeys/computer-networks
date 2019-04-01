@@ -17,12 +17,12 @@ void exit_cleanup();
 void get_server_addrinfo(const char *hostname, const char *port, struct addrinfo **server_addrinfo);
 void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_descriptor, struct addrinfo **p);
 
-void _opt_get_profiles_filtering_education(int socket_file_descriptor);
-void _opt_get_skills_filtering_city(int socket_file_descriptor);
-void _opt_add_skill_to_profile(int socket_file_descriptor);
-void _opt_get_experience_from_profile(int socket_file_descriptor);
-void _opt_get_profiles(int socket_file_descriptor);
-void _opt_get_profile(int socket_file_descriptor);
+void opt_get_profiles_filtering_education(int socket_file_descriptor);
+void opt_get_skills_filtering_city(int socket_file_descriptor);
+void opt_add_skill_to_profile(int socket_file_descriptor);
+void opt_get_experience_from_profile(int socket_file_descriptor);
+void opt_get_profiles(int socket_file_descriptor);
+void opt_get_profile(int socket_file_descriptor);
 
 void send_file_to_client(int socket_file_descriptor, FILE *f);
 
