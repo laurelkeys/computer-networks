@@ -120,21 +120,37 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_END);
     long file_size = ftell(f);
     fseek(f, 0, SEEK_SET);
-    if (v) printf("file size: %ld\n", file_size);
+    if (v) printf("send_file_to_client: file size: %ld\n", file_size);
 
     char text[file_size + 1];
     text[0] = '\0';
     char buffer[file_size + 1];
-    if (v) printf("send_file_to_client: text (empty): '''%s'''\n", text);
+    // if (v) printf("send_file_to_client: text (empty): '''%s'''\n", text);
     
     while (fgets(buffer,file_size,f)) strcat(text,buffer);
     text[file_size] = '\0';
-    if (v) printf("send_file_to_client: \n'''%s'''\n", text);
-    
+    // if (v) printf("send_file_to_client: \n'''%s'''\n", text);
+
     send_wrapper(socket_file_descriptor, text, v);
 }
 
-// FIXME
+void send_picture_to_client(int socket_file_descriptor, FILE *f) {  
+    fseek(f, 0, SEEK_END);
+    long file_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (v) printf("send_picture_to_client: file size: %ld\n", file_size);
+
+    char text[file_size + 1];
+    text[0] = '\0';
+    char buffer[file_size + 1];
+
+    while (fgets(buffer,file_size,f)) strcat(text,buffer);
+    // text[file_size] = '\0';
+    // if (v) printf("send_picture_to_client: \n'''%s'''\n", text);
+    
+    send_img_wrapper(socket_file_descriptor, text, file_size, v);
+}
+
 void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     printf("server: client selected option 1:\n");
 
@@ -217,6 +233,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     }
 }
 
+// FIXME
 void opt_get_profile(int socket_file_descriptor) {
     printf("server: client selected option 6:\n");
 
@@ -232,6 +249,16 @@ void opt_get_profile(int socket_file_descriptor) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+
+    // send img
+    FILE *img_file = fopen("./imgs/colors.jpg", "rb"); // FIXME
+    if (img_file) {
+        send_picture_to_client(socket_file_descriptor, img_file);
+        fclose(img_file);
+    } else {
+        printf("server: img_file not found\n");
+    }
+    
 }
 
 // CONNECTION ///////////////////////////

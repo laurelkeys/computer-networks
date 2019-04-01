@@ -25,6 +25,7 @@ void opt_get_profiles(int socket_file_descriptor);
 void opt_get_profile(int socket_file_descriptor);
 
 void send_file_to_client(int socket_file_descriptor, FILE *f);
+void send_picture_to_client(int socket_file_descriptor, FILE *f);
 
 // DB related stuff
 void init_db();
