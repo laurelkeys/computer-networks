@@ -4,7 +4,7 @@ sqlite3 *db;
 sqlite3_stmt *res;
 
 int current_opt = 0;
-int v = true; // TODO change for less info output
+int v = false; // TODO change for less info output
 
 int main(void) {
     init_db();

@@ -18,6 +18,9 @@ all: $(EXECS)
 clean:
 	rm -f $(OBJS) $(EXECS) *.txt *.png
 
+rmlog:
+	rm -f *.txt *.png
+
 client: client.o common.o input_parser.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
