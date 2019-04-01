@@ -16,7 +16,7 @@ MAKEFLAGS	= --no-print-directory
 all: $(EXECS)
 
 clean:
-	rm -f $(OBJS) $(EXECS)
+	rm -f $(OBJS) $(EXECS) *.txt
 
 client: client.o common.o input_parser.o
 	$(CC) $^ $(LDFLAGS) -o $@

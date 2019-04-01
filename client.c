@@ -101,8 +101,17 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     if (validate_input(return_value, "\nCurso não digitado", "Nome muito longo ", input_buffer) != OK)
         return;
 
-    printf ("Curso escolhido: '%s'\n\n", input_buffer);
     send_wrapper(socket_file_descriptor, input_buffer, v);
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("\n%s\n", buffer); // prints the received result
+
+    char header[256];
+    snprintf(header, sizeof(header), "-- (1) curso: %s --\n", input_buffer);
+    save_result_to_file(header, buffer);
+
+    free(buffer);
 }
 
 void opt_get_skills_filtering_city(int socket_file_descriptor) {
@@ -116,8 +125,17 @@ void opt_get_skills_filtering_city(int socket_file_descriptor) {
     if (validate_input(return_value, "\nCidade não digitada", "Nome muito longo ", input_buffer) != OK)
         return;
 
-    printf("Cidade escolhida: '%s'\n\n", input_buffer);
     send_wrapper(socket_file_descriptor, input_buffer, v);
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("\n%s\n", buffer); // prints the received result
+
+    char header[256];
+    snprintf(header, sizeof(header), "-- (2) cidade: %s --\n", input_buffer);
+    save_result_to_file(header, buffer);
+
+    free(buffer);
 }
 
 void opt_add_skill_to_profile(int socket_file_descriptor) {
@@ -125,20 +143,31 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
     send_wrapper(socket_file_descriptor, "3", v);
 
     int return_value;
-    char input_buffer[60]; // email/skill length <= 58
+    char input_buffer_email[60]; // email length <= 58
+    char input_buffer_skill[60]; // skill length <= 58
 
-    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));    
-    if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
+    return_value = get_input("Digite o email do perfil> ", input_buffer_email, sizeof(input_buffer_email));    
+    if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer_email) != OK)
         return;
 
-    send_wrapper(socket_file_descriptor, input_buffer, v);
+    send_wrapper(socket_file_descriptor, input_buffer_email, v);
     // TODO verify if the profile exists before asking for the skill
 
-    return_value = get_input("Digite a habilidade> ", input_buffer, sizeof(input_buffer));    
-    if (validate_input(return_value, "\nHabilidade não digitada", "Nome muito longo ", input_buffer) != OK)
+    return_value = get_input("Digite a habilidade> ", input_buffer_skill, sizeof(input_buffer_skill));    
+    if (validate_input(return_value, "\nHabilidade não digitada", "Nome muito longo ", input_buffer_skill) != OK)
         return;
 
-    send_wrapper(socket_file_descriptor, input_buffer, v);
+    send_wrapper(socket_file_descriptor, input_buffer_skill, v);
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("\n%s\n", buffer); // prints the received result
+
+    char header[256];
+    snprintf(header, sizeof(header), "-- (3) email: %s, habilidade: %s --\n", input_buffer_email, input_buffer_skill);
+    save_result_to_file(header, buffer);
+
+    free(buffer);
 }
 
 void opt_get_experience_from_profile(int socket_file_descriptor) {
@@ -153,6 +182,16 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
         return;
 
     send_wrapper(socket_file_descriptor, input_buffer, v);
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("\n%s\n", buffer); // prints the received result
+
+    char header[256];
+    snprintf(header, sizeof(header), "-- (4) email: %s --\n", input_buffer);
+    save_result_to_file(header, buffer);
+
+    free(buffer);
 }
 
 void opt_get_profiles(int socket_file_descriptor) {
@@ -161,9 +200,9 @@ void opt_get_profiles(int socket_file_descriptor) {
 
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
-    printf("%s\n", buffer); // prints the received result
+    printf("\n%s\n", buffer); // prints the received result
 
-    save_result_to_file("-- 5 --\n", buffer);    
+    save_result_to_file("-- (5) --\n", buffer);
 
     free(buffer);
 }
@@ -180,6 +219,16 @@ void opt_get_profile(int socket_file_descriptor) {
         return;
 
     send_wrapper(socket_file_descriptor, input_buffer, v);
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("\n%s\n", buffer); // prints the received result
+
+    char header[256];
+    snprintf(header, sizeof(header), "-- (6) email: %s --\n", input_buffer);
+    save_result_to_file(header, buffer);
+
+    free(buffer);
 }
 
 void print_options_list() {

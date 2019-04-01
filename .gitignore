@@ -7,6 +7,12 @@
 # Unignore all dirs
 !*/
 
+# Files
+*.txt
+*.png
+*.jpg
+*.jpeg
+
 # Prerequisites
 *.d
 
