@@ -32,7 +32,7 @@
 #define SEND_NO_FLAGS 0
 #define OPT_QUIT_STR "7"
 
-#include "common.h"
+typedef enum { false, true } bool;
 
 typedef struct profile {
     char *email;

@@ -18,7 +18,7 @@ all: $(EXECS)
 clean:
 	rm -f $(OBJS) $(EXECS)
 
-client: client.o common.o
+client: client.o common.o input_parser.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
 server: server.o common.o
