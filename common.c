@@ -52,23 +52,14 @@ int send_wrapper(int file_descriptor, char *message, int verbose) {
 }
 
 int send_img_wrapper(int file_descriptor, char *message, int msg_size, int verbose) {
-
-    FILE *img_file_as_msg;
-    img_file_as_msg = fopen("img_file_as_msg.jpg", "wb");
-    char img_buffer[msg_size];
-    int i;
-    for(i = 0; i < sizeof(img_buffer); i++) {
-        fprintf(img_file_as_msg, "%c", message[i]);
-    }
-    fclose(img_file_as_msg);
-
-
     verbose = 0; // FIXME remove
     char *header = _msg_size_to_str(msg_size);
 
+    int n;
+
+    // Send header
     int bytes_sent = 0; // how many bytes we've sent
     int bytes_left = HEADER_SIZE - 1; // how many we have left to send
-    int n;
     while (bytes_sent < HEADER_SIZE - 1) {
         n = send(file_descriptor, header + bytes_sent, bytes_left, 0);
         if (n == -1) { 
@@ -83,8 +74,9 @@ int send_img_wrapper(int file_descriptor, char *message, int msg_size, int verbo
         bytes_left -= n;
     }
     printf("%s\n", header);
-
     free(header);
+
+    // Send picture
     bytes_sent = 0;
     bytes_left = msg_size;
     while (bytes_sent < msg_size) {
@@ -134,8 +126,7 @@ int recv_wrapper(int file_descriptor, char **buffer, int verbose) {
     }
 
     header_buffer[HEADER_SIZE - 1] = '\0';
-    //if (verbose) 
-    printf("recv_wrapper: header_buffer: %s\n", header_buffer);
+    if (verbose) printf("recv_wrapper: header_buffer: %s\n", header_buffer);
 
     if (header_buffer[HEADER_SIZE - 2] != ';') perror("Header ending not found");
 
@@ -183,8 +174,7 @@ int recv_img_wrapper(int file_descriptor, char **buffer, int *size, int verbose)
     }
 
     header_buffer[HEADER_SIZE - 1] = '\0';
-    //if (verbose) 
-    printf("recv_img_wrapper: header_buffer: %s\n", header_buffer);
+    if (verbose) printf("recv_img_wrapper: header_buffer: %s\n", header_buffer);
 
     if (header_buffer[HEADER_SIZE - 2] != ';') perror("Header ending not found");
 

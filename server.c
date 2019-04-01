@@ -125,11 +125,9 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     char text[file_size + 1];
     text[0] = '\0';
     char buffer[file_size + 1];
-    // if (v) printf("send_file_to_client: text (empty): '''%s'''\n", text);
     
     while (fgets(buffer,file_size,f)) strcat(text,buffer);
     text[file_size] = '\0';
-    // if (v) printf("send_file_to_client: \n'''%s'''\n", text);
 
     send_wrapper(socket_file_descriptor, text, v);
 }
@@ -140,23 +138,17 @@ void send_picture_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_SET);
     if (v) printf("send_picture_to_client: file size: %ld\n", file_size);
 
-    FILE *img_file;
-    img_file = fopen("img_file.jpg", "wb");
-    char img_buffer[file_size + 1];
     int i;
-    // if (v) printf("send_picture_to_client: \n'''");
+    char img_buffer[file_size + 1];
     for(i = 0; i < sizeof(img_buffer); i++) {
         fread(img_buffer + i, 1, 1, f);
-        // if (v) printf("%c", img_buffer[i]);
-        fprintf(img_file, "%c", img_buffer[i]);
     }
-    // if (v) printf("'''\n");
-    fclose(img_file);
     
     send_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer), v);
 }
 
 void opt_get_profiles_filtering_education(int socket_file_descriptor) {
+    // (1) listar todas as pessoas formadas em um determinado curso
     printf("server: client selected option 1:\n");
 
     char *buffer;
@@ -174,6 +166,7 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
 }
 
 void opt_get_skills_filtering_city(int socket_file_descriptor) {
+    // (2) listar as habilidades dos perfis que moram em uma determinada cidade
     printf("server: client selected option 2:\n");
 
     char *buffer;
@@ -191,6 +184,7 @@ void opt_get_skills_filtering_city(int socket_file_descriptor) {
 }
 
 void opt_add_skill_to_profile(int socket_file_descriptor) {
+    // (3) acrescentar uma nova experiência em um perfil
     printf("server: client selected option 3:\n");
 
     char *email;
@@ -210,6 +204,7 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
 }
 
 void opt_get_experience_from_profile(int socket_file_descriptor) {
+    // (4) dado o email do perfil, retornar sua experiência
     printf("server: client selected option 4:\n");
 
     char *email;
@@ -227,6 +222,7 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
 }
 
 void opt_get_profiles(int socket_file_descriptor) {
+    // (5) listar todas as informações de todos os perfis
     printf("server: client selected option 5:\n");
 
     opt_get_profiles_sql(); // queries database
@@ -236,10 +232,13 @@ void opt_get_profiles(int socket_file_descriptor) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+
+    // TODO get list of emails and send their pictures
 }
 
 // FIXME
 void opt_get_profile(int socket_file_descriptor) {
+    // (6) dado o email de um perfil, retornar suas informações
     printf("server: client selected option 6:\n");
 
     char *email;    
@@ -247,7 +246,6 @@ void opt_get_profile(int socket_file_descriptor) {
     printf("server: email '%s'\n", email);
 
     opt_get_profile_sql(email); // queries database
-    free(email);
 
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
@@ -255,13 +253,17 @@ void opt_get_profile(int socket_file_descriptor) {
         fclose(f);
     }
 
-    // send img
-    FILE *img_file = fopen("./imgs/bean.png", "rb"); // FIXME
+    // Send img
+    char img_file_path[strlen(email) + 11];
+    sprintf(img_file_path, "./imgs/%s.png", email);
+    free(email);
+
+    FILE *img_file = fopen(img_file_path, "rb");
     if (img_file) {
         send_picture_to_client(socket_file_descriptor, img_file);
         fclose(img_file);
     } else {
-        printf("server: img_file not found\n");
+        printf("server: img_file not found (path: '%s')\n", img_file_path);
     }
     
 }
