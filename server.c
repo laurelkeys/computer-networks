@@ -4,6 +4,7 @@ sqlite3 *db;
 sqlite3_stmt *res;
 
 int current_opt = 0;
+int v = true; // TODO change for fewer info output
 
 int main(void) {
     init_db();
@@ -38,7 +39,7 @@ int main(void) {
     socklen_t sin_size;
     char s[INET6_ADDRSTRLEN];
     int new_file_descriptor; // new connection on new_file_descriptor
-    while (1) {  // main accept() loop
+    while (true) {  // main accept() loop
         sin_size = sizeof their_addr;
         new_file_descriptor = accept(socket_file_descriptor, (struct sockaddr *)&their_addr, &sin_size);
         if (new_file_descriptor == -1) {
@@ -69,8 +70,8 @@ void receive_messages(int socket_file_descriptor) {
     char *buffer;
     char opt;
 
-    while (1) {
-        recv_wrapper(socket_file_descriptor, &buffer);
+    while (true) {
+        recv_wrapper(socket_file_descriptor, &buffer, v);
         printf("server: received from client '%s'\n", buffer);
         opt = buffer[0];
         free(buffer);
@@ -148,7 +149,7 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     while (fgets(buffer,file_size,f)) strcat(text,buffer);
     text[file_size] = '\0';
     printf("send_file_to_client: \n'''%s'''\n", text);
-    send_wrapper(socket_file_descriptor, text);
+    send_wrapper(socket_file_descriptor, text, v);
 }
 
 // FIXME

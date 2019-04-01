@@ -28,21 +28,8 @@
 #define SOCKET_IPV4 PF_INET
 #define SOCKET_IPV6 PF_INET6
 
-#define MAXDATASIZE 102 // max number of bytes we can get at onces
-#define SEND_NO_FLAGS 0
 #define OPT_QUIT_STR "7"
 
 typedef enum { false, true } bool;
-
-typedef struct profile {
-    char *email;
-    char *name;
-    char *surname;
-    char *photo_url; // FIXME change to .png or .jpeg file
-    char *city;
-    char *education;
-    char **skills; // array of strings
-    char **prior_experience; // array of strings
-} profile;
 
 #endif
