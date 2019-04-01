@@ -4,7 +4,7 @@ sqlite3 *db;
 sqlite3_stmt *res;
 
 int current_opt = 0;
-int v = true; // TODO change for fewer info output
+int v = true; // TODO change for less info output
 
 int main(void) {
     init_db();
@@ -12,7 +12,7 @@ int main(void) {
     struct addrinfo *server_addrinfo;
     get_server_addrinfo(NULL, PORT, &server_addrinfo);
 
-    int socket_file_descriptor;  // listen on socket_file_descriptor
+    int socket_file_descriptor; // listen on socket_file_descriptor
     struct addrinfo *connected_addrinfo;
     bind_to_first_match(server_addrinfo, &socket_file_descriptor, &connected_addrinfo);
     freeaddrinfo(server_addrinfo); // all done with this structure
@@ -39,7 +39,7 @@ int main(void) {
     socklen_t sin_size;
     char s[INET6_ADDRSTRLEN];
     int new_file_descriptor; // new connection on new_file_descriptor
-    while (true) {  // main accept() loop
+    while (true) { // main accept() loop
         sin_size = sizeof their_addr;
         new_file_descriptor = accept(socket_file_descriptor, (struct sockaddr *)&their_addr, &sin_size);
         if (new_file_descriptor == -1) {
@@ -59,7 +59,7 @@ int main(void) {
             exit(0);
         }
 
-        close(new_file_descriptor);  // parent doesn't need this
+        close(new_file_descriptor); // parent doesn't need this
     }
 
     exit(0);
@@ -72,7 +72,7 @@ void receive_messages(int socket_file_descriptor) {
 
     while (true) {
         recv_wrapper(socket_file_descriptor, &buffer, v);
-        printf("server: received from client '%s'\n", buffer);
+        printf("server: received from client: '%s'\n", buffer);
         opt = buffer[0];
         free(buffer);
 
@@ -106,7 +106,6 @@ void sigchld_handler(int s) {
     errno = saved_errno;
 }
 
-// get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa) {
     if (sa->sa_family == STRUCT_IPV6) {
         return &(((struct sockaddr_in6*)sa)->sin6_addr);
@@ -116,6 +115,21 @@ void *get_in_addr(struct sockaddr *sa) {
 }
 
 // OPTIONS //////////////////////////////
+
+void send_file_to_client(int socket_file_descriptor, FILE *f) {  
+    fseek(f, 0, SEEK_END);
+    long file_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (v) printf("file size: %ld\n", file_size);
+
+    char text[file_size + 1];
+    char buffer[file_size + 1];
+    while (fgets(buffer,file_size,f)) strcat(text, buffer);
+    text[file_size] = '\0';
+    
+    if (v) printf("send_file_to_client: \n'''%s'''\n", text);
+    send_wrapper(socket_file_descriptor, text, v);
+}
 
 void _opt_get_profiles_filtering_education(int socket_file_descriptor) {
     printf("option selected: 1\n");
@@ -137,21 +151,6 @@ void _opt_get_experience_from_profile(int socket_file_descriptor) {
     // if (send(socket_file_descriptor, "opt selected: 4", 15, 0) == -1) perror("send");
 }
 
-void send_file_to_client(int socket_file_descriptor, FILE *f) {  
-    fseek(f, 0, SEEK_END);
-    long file_size = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    printf("file size: %ld\n", file_size);
-
-    // TODO send file with send_wrapper
-    char text[file_size+1];
-    char buffer[file_size+1];
-    while (fgets(buffer,file_size,f)) strcat(text,buffer);
-    text[file_size] = '\0';
-    printf("send_file_to_client: \n'''%s'''\n", text);
-    send_wrapper(socket_file_descriptor, text, v);
-}
-
 // FIXME
 void _opt_get_profiles(int socket_file_descriptor) {
     printf("option selected: 5\n");
@@ -159,7 +158,7 @@ void _opt_get_profiles(int socket_file_descriptor) {
     // printf("bytes_left: %d\n", bytes_left);
 
     // if (send(socket_file_descriptor, "opt selected: 5", 15, 0) == -1) perror("send");
-    opt_get_profiles(); // queries database
+    opt_get_profiles_sql(); // queries database
     send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
 }
 
@@ -200,7 +199,7 @@ void opt_get_experience_from_profile(char *email) {
     execute_sql(sql);
 }
 
-void opt_get_profiles() {
+void opt_get_profiles_sql() {
     current_opt = 5;
     char *sql = 
         "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
@@ -213,7 +212,7 @@ void opt_get_profiles() {
     execute_sql(sql);
 }
 
-void opt_get_profile(char *email) {
+void opt_get_profile_sql(char *email) {
     current_opt = 6;
     char sql[500+strlen(email)];
     char *sql_part = 
