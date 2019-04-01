@@ -10,7 +10,7 @@
 # Files
 *.txt
 *.png
-# *.jpg
+*.jpg
 *.jpeg
 
 # Prerequisites

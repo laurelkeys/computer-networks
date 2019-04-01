@@ -5,6 +5,8 @@
 #define NO_INPUT 1
 #define TOO_LONG 2
 
+#define MAX_INPUT_SIZE 128
+
 #include <stdio.h>
 #include <string.h>
 

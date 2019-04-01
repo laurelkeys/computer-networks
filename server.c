@@ -256,7 +256,7 @@ void opt_get_profile(int socket_file_descriptor) {
     }
 
     // send img
-    FILE *img_file = fopen("./imgs/green.jpg", "rb"); // FIXME
+    FILE *img_file = fopen("./imgs/bean.png", "rb"); // FIXME
     if (img_file) {
         send_picture_to_client(socket_file_descriptor, img_file);
         fclose(img_file);
