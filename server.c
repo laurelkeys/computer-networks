@@ -160,7 +160,7 @@ void _opt_get_profiles(int socket_file_descriptor) {
 
     // if (send(socket_file_descriptor, "opt selected: 5", 15, 0) == -1) perror("send");
     opt_get_profiles(); // queries database
-    send_file_to_client(socket_file_descriptor, fopen("result.txt", "r"));
+    send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
 }
 
 void _opt_get_profile(int socket_file_descriptor) {
@@ -277,7 +277,7 @@ void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_desc
 
 void execute_sql(char *sql) {
     char *err_msg = 0;
-    fclose(fopen("result.txt", "w"));
+    fclose(fopen(FILE_SERVER, "w"));
     if (sqlite3_exec(db, sql, send_info_callback, 0, &err_msg) != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);        
@@ -295,7 +295,7 @@ int send_info_callback(void *not_used, int length, char **column_content, char *
     printf("\nCallback from opt %d\n", current_opt);
 
     FILE *f;
-    f = fopen("result.txt", "a");
+    f = fopen(FILE_SERVER, "a");
     char buffer[512];
     for (int i = 0; i < length; i++) {
         snprintf(buffer, sizeof(buffer), "%s = %s\n", column_name[i], column_content[i] ? column_content[i] : "NULL");

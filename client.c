@@ -82,8 +82,8 @@ void read_option(int *option) {
     } while (end != option_buffer + strlen(option_buffer));
 }
 
-// (1) listar todas as pessoas formadas em um determinado curso
 void opt_get_profiles_filtering_education(int socket_file_descriptor) {
+    // (1) listar todas as pessoas formadas em um determinado curso
     send_wrapper(socket_file_descriptor, "1", v);
 
     int return_value;
@@ -97,8 +97,8 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     send_wrapper(socket_file_descriptor, input_buffer, v);
 }
 
-// (2) listar as habilidades dos perfis que moram em uma determinada cidade
 void opt_get_skills_filtering_city(int socket_file_descriptor) {
+    // (2) listar as habilidades dos perfis que moram em uma determinada cidade
     send_wrapper(socket_file_descriptor, "2", v);
 
     int return_value;
@@ -112,8 +112,8 @@ void opt_get_skills_filtering_city(int socket_file_descriptor) {
     send_wrapper(socket_file_descriptor, input_buffer, v);
 }
 
-// (3) acrescentar uma nova experiência em um perfil
 void opt_add_skill_to_profile(int socket_file_descriptor) {
+    // (3) acrescentar uma nova experiência em um perfil
     send_wrapper(socket_file_descriptor, "3", v);
 
     int return_value;
@@ -133,8 +133,8 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
     send_wrapper(socket_file_descriptor, input_buffer, v);
 }
 
-// (4) dado o email do perfil, retornar sua experiência
 void opt_get_experience_from_profile(int socket_file_descriptor) {
+    // (4) dado o email do perfil, retornar sua experiência
     send_wrapper(socket_file_descriptor, "4", v);
 
     int return_value;
@@ -147,25 +147,29 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
     send_wrapper(socket_file_descriptor, input_buffer, v);
 }
 
-// (5) listar todas as informações de todos os perfis
+void save_result_to_file(char *result_header, char *result_buffer) {
+    FILE *f;
+    f = fopen(FILE_CLIENT, "a");
+    fprintf(f, "%s", result_header);
+    fprintf(f, "%s", result_buffer);
+    fclose(f);
+}
+
 void opt_get_profiles(int socket_file_descriptor) {
+    // (5) listar todas as informações de todos os perfis
     send_wrapper(socket_file_descriptor, "5", v);
 
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("%s\n", buffer); // prints the received result
 
-    FILE *f;
-    f = fopen("results.txt", "a");
-    fprintf(f, "-- 5 --\n");
-    fprintf(f, "%s", buffer);
-    fclose(f);
+    save_result_to_file("-- 5 --\n", buffer);    
 
     free(buffer);
 }
 
-// (6) dado o email de um perfil, retornar suas informações
 void opt_get_profile(int socket_file_descriptor) {
+    // (6) dado o email de um perfil, retornar suas informações
     send_wrapper(socket_file_descriptor, "6", v);
 
     int return_value;
