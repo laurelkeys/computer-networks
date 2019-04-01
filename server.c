@@ -152,6 +152,15 @@ void _opt_get_profiles_filtering_education(int socket_file_descriptor) {
 void _opt_get_skills_filtering_city(int socket_file_descriptor) {
     printf("option selected: 2\n");
     // if (send(socket_file_descriptor, "opt selected: 2", 15, 0) == -1) perror("send");
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("server: city '%s'\n", buffer);
+
+    opt_get_skills_filtering_city(buffer); // queries database
+    free(buffer);
+
+    send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
 }
 
 void _opt_add_skill_to_profile(int socket_file_descriptor) {
