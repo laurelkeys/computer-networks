@@ -151,13 +151,16 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
 void opt_get_profiles(int socket_file_descriptor) {
     send_wrapper(socket_file_descriptor, "5", v);
 
-    // int file_size;
-    // TODO get response size and read it
-
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("%s\n", buffer); // prints the received result
 
-    printf("client: opt 5 result: '%s'\n", buffer);
+    FILE *f;
+    f = fopen("results.txt", "a");
+    fprintf(f, "-- 5 --\n");
+    fprintf(f, "%s", buffer);
+    fclose(f);
+
     free(buffer);
 }
 

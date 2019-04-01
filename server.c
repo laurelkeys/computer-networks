@@ -303,7 +303,7 @@ int send_info_callback(void *not_used, int length, char **column_content, char *
         fprintf(f, "%s", buffer);
     }
 
-    fprintf(f, "\n");  
+    fprintf(f, "\n");
     fclose(f);
     return 0;
 }

@@ -20,6 +20,7 @@ static char* _msg_size_to_str(int size) {
 }
 
 int send_wrapper(int file_descriptor, char * message, int verbose) {
+    verbose = 0; // FIXME remove
     int msg_size = strlen(message);
     char *header = _msg_size_to_str(msg_size);
     msg_size += HEADER_SIZE - 1;
@@ -62,6 +63,7 @@ static int _msg_size_to_int(char * size) {
 }
 
 int recv_wrapper(int file_descriptor, char **buffer, int verbose) {
+    verbose = 0; // FIXME remove
     char header_buffer[HEADER_SIZE];
     int bytes_received = 0;
     int n;
