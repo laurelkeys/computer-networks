@@ -126,14 +126,19 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_SET);
     if (v) printf("send_file_to_client: file size: %ld\n", file_size);
 
-    char text[file_size + 1];
-    text[0] = '\0';
-    char buffer[file_size + 1];
-    
-    while (fgets(buffer,file_size,f)) strcat(text,buffer);
-    text[file_size] = '\0';
+    if (file_size == 0) {
+        send_wrapper(socket_file_descriptor, "No results", v);
+    } else {
 
-    send_wrapper(socket_file_descriptor, text, v);
+        char text[file_size + 1];
+        text[0] = '\0';
+        char buffer[file_size + 1];
+        
+        while (fgets(buffer,file_size,f)) strcat(text,buffer);
+        text[file_size] = '\0';
+
+        send_wrapper(socket_file_descriptor, text, v);
+    }
 }
 
 void send_picture_to_client(int socket_file_descriptor, FILE *f) {  
