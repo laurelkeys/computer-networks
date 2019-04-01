@@ -140,30 +140,20 @@ void send_picture_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_SET);
     if (v) printf("send_picture_to_client: file size: %ld\n", file_size);
 
-    char text[file_size + 1];
-    text[0] = '\0';
-    char buffer[file_size + 1];
-
-
     FILE *img_file;
-    char img_buffer[file_size + 1];
     img_file = fopen("img_file.jpg", "wb");
+    char img_buffer[file_size + 1];
     int i;
-    if (v) printf("send_picture_to_client: \n'''");
+    // if (v) printf("send_picture_to_client: \n'''");
     for(i = 0; i < sizeof(img_buffer); i++) {
         fread(img_buffer + i, 1, 1, f);
-        if (v) printf("%c", img_buffer[i]);
+        // if (v) printf("%c", img_buffer[i]);
         fprintf(img_file, "%c", img_buffer[i]);
     }
-    if (v) printf("'''\n");
+    // if (v) printf("'''\n");
     fclose(img_file);
-
-
-    while (fgets(buffer,file_size,f)) strcat(text,buffer); // FIXME not text
-    // text[file_size] = '\0';
-    // if (v) printf("send_picture_to_client: \n'''%s'''\n", text);
     
-    send_img_wrapper(socket_file_descriptor, text, file_size, v);
+    send_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer), v);
 }
 
 void opt_get_profiles_filtering_education(int socket_file_descriptor) {

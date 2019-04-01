@@ -19,7 +19,7 @@ static char* _msg_size_to_str(int size) {
     return result;
 }
 
-int send_wrapper(int file_descriptor, char * message, int verbose) {
+int send_wrapper(int file_descriptor, char *message, int verbose) {
     verbose = 0; // FIXME remove
     int msg_size = strlen(message);
     char *header = _msg_size_to_str(msg_size);
@@ -51,23 +51,26 @@ int send_wrapper(int file_descriptor, char * message, int verbose) {
     return bytes_left; // return # of unsent bytes
 }
 
-int send_img_wrapper(int file_descriptor, char * message, int msg_size, int verbose) {
-    // verbose = 0; // FIXME remove
-    char *header = _msg_size_to_str(msg_size);
-    msg_size += HEADER_SIZE - 1;
-    //if (verbose) 
-    printf("send_img_wrapper: msg_size: %d\n", msg_size);
+int send_img_wrapper(int file_descriptor, char *message, int msg_size, int verbose) {
 
-    char buffer[msg_size];
-    sprintf(buffer, "%s%s", header, message);
-    free(header);
-    if (verbose) printf("send_img_wrapper: header+message: '''%s'''\n", buffer);
+    FILE *img_file_as_msg;
+    img_file_as_msg = fopen("img_file_as_msg.jpg", "wb");
+    char img_buffer[msg_size];
+    int i;
+    for(i = 0; i < sizeof(img_buffer); i++) {
+        fprintf(img_file_as_msg, "%c", message[i]);
+    }
+    fclose(img_file_as_msg);
+
+
+    verbose = 0; // FIXME remove
+    char *header = _msg_size_to_str(msg_size);
 
     int bytes_sent = 0; // how many bytes we've sent
-    int bytes_left = msg_size; // how many we have left to send
+    int bytes_left = HEADER_SIZE - 1; // how many we have left to send
     int n;
-    while (bytes_sent < msg_size) {
-        n = send(file_descriptor, buffer + bytes_sent, bytes_left, 0);
+    while (bytes_sent < HEADER_SIZE - 1) {
+        n = send(file_descriptor, header + bytes_sent, bytes_left, 0);
         if (n == -1) { 
             perror("send_img_wrapper: common: send");
             break; 
@@ -79,7 +82,25 @@ int send_img_wrapper(int file_descriptor, char * message, int msg_size, int verb
         bytes_sent += n;
         bytes_left -= n;
     }
-    
+    printf("%s\n", header);
+
+    free(header);
+    bytes_sent = 0;
+    bytes_left = msg_size;
+    while (bytes_sent < msg_size) {
+        n = send(file_descriptor, message + bytes_sent, bytes_left, 0);
+        if (n == -1) { 
+            perror("send_img_wrapper: common: send");
+            break; 
+        } else if (n <= 0) {
+            perror("send_img_wrapper: common: n <= 0");
+            break; 
+        }
+
+        bytes_sent += n;
+        bytes_left -= n;
+    }
+
     return bytes_left; // return # of unsent bytes
 }
 
