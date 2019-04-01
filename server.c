@@ -127,10 +127,10 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     char text[file_size+1];
     text[0] = '\0';
     char buffer[file_size+1];
-    printf("send_file_to_client - before: \n'''%s'''\n", text);
+    // printf("send_file_to_client - before: \n'''%s'''\n", text);
     while (fgets(buffer,file_size,f)) strcat(text,buffer);
     text[file_size] = '\0';
-    printf("send_file_to_client: \n'''%s'''\n", text);
+    // printf("send_file_to_client: \n'''%s'''\n", text);
     send_wrapper(socket_file_descriptor, text, v);
     fclose(f);
 }
@@ -207,6 +207,24 @@ void _opt_get_profiles(int socket_file_descriptor) {
     send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
 }
 
+void send_picture_to_client(int socket_file_descriptor, FILE *f) {  
+    fseek(f, 0, SEEK_END);
+    long file_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    printf("file size: %ld\n", file_size);
+
+    // TODO send file with send_wrapper
+    char text[file_size+1];
+    text[0] = '\0';
+    char buffer[file_size+1];
+    // printf("send_file_to_client - before: \n'''%s'''\n", text);
+    while (fgets(buffer,file_size,f)) strcat(text,buffer);
+    // text[file_size] = '\0';
+    // printf("send_file_to_client: \n'''%s'''\n", text);
+    send_img_wrapper(socket_file_descriptor, text, file_size, v);
+    fclose(f);
+}
+
 void _opt_get_profile(int socket_file_descriptor) {
     printf("option selected: 6\n");
     // if (send(socket_file_descriptor, "opt selected: 6", 15, 0) == -1) perror("send");
@@ -219,6 +237,9 @@ void _opt_get_profile(int socket_file_descriptor) {
     free(email);
 
     send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
+
+    // Send img
+    send_picture_to_client(socket_file_descriptor, fopen("./imgs/jaws_boi.png", "rb"));
 }
 
 void opt_get_profiles_filtering_education(char *education) {

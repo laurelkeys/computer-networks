@@ -200,12 +200,23 @@ void opt_get_profiles(int socket_file_descriptor) {
     free(buffer);
 }
 
+void save_img(char *file_name, char *buffer, int img_size) {
+    FILE *f;
+    strcat(file_name, ".png\0");
+    f = fopen(file_name, "wb");
+    for (int i = 0; i < img_size; i++) {
+        putc(buffer[i], f);
+    }
+    // fprintf(f, "%s", buffer);
+    fclose(f);
+}
+
 void opt_get_profile(int socket_file_descriptor) {
     // (6) dado o email de um perfil, retornar suas informações
     send_wrapper(socket_file_descriptor, "6", v);
 
     int return_value;
-    char input_buffer[60]; // email length <= 58
+    char input_buffer[65]; // email length <= 58
 
     return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));    
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
@@ -213,11 +224,21 @@ void opt_get_profile(int socket_file_descriptor) {
 
     send_wrapper(socket_file_descriptor, input_buffer, v);
 
+    // Save info
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("%s\n", buffer); // prints the received result
 
     save_result_to_file("-- 6 --\n", buffer);
+
+    free(buffer);
+
+    //Save picture
+    int img_size;
+    recv_img_wrapper(socket_file_descriptor, &buffer, &img_size, v);
+    // printf("%s\n", buffer); // prints the received result
+
+    save_img(input_buffer, buffer, img_size);
 
     free(buffer);
 }
