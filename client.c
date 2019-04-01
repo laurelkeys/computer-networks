@@ -82,6 +82,14 @@ void read_option(int *option) {
     } while (end != option_buffer + strlen(option_buffer));
 }
 
+void save_result_to_file(char *result_header, char *result_buffer) {
+    FILE *f;
+    f = fopen(FILE_CLIENT, "a");
+    fprintf(f, "%s", result_header);
+    fprintf(f, "%s", result_buffer);
+    fclose(f);
+}
+
 void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     // (1) listar todas as pessoas formadas em um determinado curso
     send_wrapper(socket_file_descriptor, "1", v);
@@ -145,14 +153,6 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
         return;
 
     send_wrapper(socket_file_descriptor, input_buffer, v);
-}
-
-void save_result_to_file(char *result_header, char *result_buffer) {
-    FILE *f;
-    f = fopen(FILE_CLIENT, "a");
-    fprintf(f, "%s", result_header);
-    fprintf(f, "%s", result_buffer);
-    fclose(f);
 }
 
 void opt_get_profiles(int socket_file_descriptor) {
