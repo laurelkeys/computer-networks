@@ -212,6 +212,14 @@ void opt_get_profile(int socket_file_descriptor) {
         return;
 
     send_wrapper(socket_file_descriptor, input_buffer, v);
+
+    char *buffer;
+    recv_wrapper(socket_file_descriptor, &buffer, v);
+    printf("%s\n", buffer); // prints the received result
+
+    save_result_to_file("-- 6 --\n", buffer);
+
+    free(buffer);
 }
 
 void print_options_list() {

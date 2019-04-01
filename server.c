@@ -210,6 +210,15 @@ void _opt_get_profiles(int socket_file_descriptor) {
 void _opt_get_profile(int socket_file_descriptor) {
     printf("option selected: 6\n");
     // if (send(socket_file_descriptor, "opt selected: 6", 15, 0) == -1) perror("send");
+
+    char *email;
+    recv_wrapper(socket_file_descriptor, &email, v);
+    printf("server: email '%s'\n", email);
+
+    opt_get_profile(email); // queries database
+    free(email);
+
+    send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
 }
 
 void opt_get_profiles_filtering_education(char *education) {
