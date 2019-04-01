@@ -144,7 +144,22 @@ void send_picture_to_client(int socket_file_descriptor, FILE *f) {
     text[0] = '\0';
     char buffer[file_size + 1];
 
-    while (fgets(buffer,file_size,f)) strcat(text,buffer);
+
+    FILE *img_file;
+    char img_buffer[file_size + 1];
+    img_file = fopen("img_file.jpg", "wb");
+    int i;
+    if (v) printf("send_picture_to_client: \n'''");
+    for(i = 0; i < sizeof(img_buffer); i++) {
+        fread(img_buffer + i, 1, 1, f);
+        if (v) printf("%c", img_buffer[i]);
+        fprintf(img_file, "%c", img_buffer[i]);
+    }
+    if (v) printf("'''\n");
+    fclose(img_file);
+
+
+    while (fgets(buffer,file_size,f)) strcat(text,buffer); // FIXME not text
     // text[file_size] = '\0';
     // if (v) printf("send_picture_to_client: \n'''%s'''\n", text);
     
@@ -251,7 +266,7 @@ void opt_get_profile(int socket_file_descriptor) {
     }
 
     // send img
-    FILE *img_file = fopen("./imgs/colors.jpg", "rb"); // FIXME
+    FILE *img_file = fopen("./imgs/green.jpg", "rb"); // FIXME
     if (img_file) {
         send_picture_to_client(socket_file_descriptor, img_file);
         fclose(img_file);
