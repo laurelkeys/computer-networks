@@ -69,6 +69,7 @@ void receive_messages(int socket_file_descriptor) {
     int numbytes; // length of the message written to the buffer
     char *buffer;
     char opt;
+    struct timeval tv3, tv4;
 
     while (true) {
         recv_wrapper(socket_file_descriptor, &buffer, v);
@@ -78,7 +79,7 @@ void receive_messages(int socket_file_descriptor) {
 
         if (opt == OPT_QUIT_STR[0]) break; // FIXME
 
-        log_timestamp("Server:Received opt");
+        gettimeofday(&tv3, NULL);
         switch (opt - '0') {
             case 1: opt_get_profiles_filtering_education(socket_file_descriptor);
             break;
@@ -93,7 +94,8 @@ void receive_messages(int socket_file_descriptor) {
             case 6: opt_get_profile(socket_file_descriptor);
             break;
         }
-        log_timestamp("Server:Finished processing");
+        gettimeofday(&tv4, NULL);
+        printf("TEMPO DE PROCESSAMENTO: %ldus\n", tv4.tv_usec-tv3.tv_usec);
     }
 }
 
@@ -118,7 +120,7 @@ void *get_in_addr(struct sockaddr *sa) {
 
 // OPTIONS //////////////////////////////
 
-void send_file_to_client(int socket_file_descriptor, FILE *f) {  
+void send_file_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_END);
     long file_size = ftell(f);
     fseek(f, 0, SEEK_SET);
@@ -130,7 +132,7 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
         char text[file_size + 1];
         text[0] = '\0';
         char buffer[file_size + 1];
-        
+
         while (fgets(buffer,file_size,f)) strcat(text,buffer);
         text[file_size] = '\0';
 
@@ -138,7 +140,7 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     }
 }
 
-void send_picture_to_client(int socket_file_descriptor, FILE *f) {  
+void send_picture_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_END);
     long file_size = ftell(f);
     fseek(f, 0, SEEK_SET);
@@ -149,7 +151,7 @@ void send_picture_to_client(int socket_file_descriptor, FILE *f) {
     for (i = 0; i < sizeof(img_buffer); i++) {
         fread(img_buffer + i, 1, 1, f);
     }
-    
+
     send_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer), v);
 }
 
@@ -157,44 +159,36 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     // (1) listar todas as pessoas formadas em um determinado curso
     printf("server: client selected option 1:\n");
 
-    log_timestamp("Server:Waiting for education");
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("server: education '%s'\n", buffer);
 
-    log_timestamp("Server:Received education, running query");
     opt_get_profiles_filtering_education_sql(buffer); // queries database
     free(buffer);
-    log_timestamp("Server:Query result, now sending to client");
 
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
-    log_timestamp("Server:Sent to client");
 }
 
 void opt_get_skills_filtering_city(int socket_file_descriptor) {
     // (2) listar as habilidades dos perfis que moram em uma determinada cidade
     printf("server: client selected option 2:\n");
 
-    log_timestamp("Server:Waiting for city");
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("server: city '%s'\n", buffer);
 
-    log_timestamp("Server:Received city, running query");
     opt_get_skills_filtering_city_sql(buffer); // queries database
     free(buffer);
 
-    log_timestamp("Server:Query result, now sending to client");
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
-    log_timestamp("Server:Sent to client");
 }
 
 void opt_add_skill_to_profile(int socket_file_descriptor) {
@@ -233,7 +227,6 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
-    log_timestamp("Server:Sent to client");
 }
 
 void opt_get_profiles(int socket_file_descriptor) {
@@ -247,7 +240,6 @@ void opt_get_profiles(int socket_file_descriptor) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
-    log_timestamp("Server:Sent to client");
 
     // get list of emails and send their pictures
     char *emails;
@@ -260,10 +252,10 @@ void opt_get_profiles(int socket_file_descriptor) {
     // printf("Get profiles sending pics - size(all emails):%ld\n", strlen(emails));
     while (end < strlen(emails) && *(emails+end) != '\0') {
         // Put "email = XXXXXXX@XXXX.com" in the buffer
-        while (*(emails+end) != '\n') end++; 
+        while (*(emails+end) != '\n') end++;
         email = malloc(end-begin+5);
         strncpy(email, emails+begin, end-begin);
-        
+
         email[1] = '.';
         email[2] = '/';
         email[3] = 'i';
@@ -277,7 +269,7 @@ void opt_get_profiles(int socket_file_descriptor) {
         email[end-begin+3] = 'g';
         email[end-begin+4] = '\0';
 
-        f = fopen((email+1),"rb"); 
+        f = fopen((email+1),"rb");
         printf("server: uploading picture to client: %s\n", (email+1));
         email[end-begin] = '\0';
         if (f) {
@@ -301,7 +293,7 @@ void opt_get_profile(int socket_file_descriptor) {
     // (6) dado o email de um perfil, retornar suas informações
     printf("server: client selected option 6:\n");
 
-    char *email;    
+    char *email;
     recv_wrapper(socket_file_descriptor, &email, v);
     printf("server: email '%s'\n", email);
 
@@ -312,12 +304,11 @@ void opt_get_profile(int socket_file_descriptor) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
-    log_timestamp("Server:Sent to client");
 
     // Send img
-    char *img_file_name = picture_name_from_email(email);
+    char *img_file_name = email;
     free(email);
-    
+
     char img_file_path[strlen(img_file_name) + 11];
     sprintf(img_file_path, "./imgs/%s.png", img_file_name);
     free(img_file_name);
@@ -329,7 +320,7 @@ void opt_get_profile(int socket_file_descriptor) {
     } else {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
     }
-    
+
 }
 
 // CONNECTION ///////////////////////////
@@ -384,10 +375,10 @@ void execute_sql(char *sql) {
     fclose(fopen(FILE_SERVER, "w")); // rewrites FILE_SERVER with the latest query result
     if (sqlite3_exec(db, sql, send_info_callback, 0, &err_msg) != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
-        sqlite3_free(err_msg);        
+        sqlite3_free(err_msg);
         sqlite3_close(db);
         exit(1);
-    }     
+    }
 }
 
 void exit_cleanup() {
@@ -406,7 +397,7 @@ int send_info_callback(void *not_used, int length, char **column_content, char *
         printf("%s", buffer);
         fprintf(f, "%s", buffer);
     }
-    
+
     if (v) printf("callback end (opt %d).\n", current_opt);
     fprintf(f, "\n");
     fclose(f);
@@ -437,19 +428,19 @@ void opt_get_profiles_filtering_education_sql(char *education) {
     current_opt = 1;
     char *sql_part = "SELECT name FROM Profile WHERE education = '%s'";
     char sql[strlen(sql_part) + strlen(education)];
-    
+
     sprintf(sql, sql_part, education);
-    
-    execute_sql(sql);    
+
+    execute_sql(sql);
 }
 
 void opt_get_skills_filtering_city_sql(char *city) {
     current_opt = 2;
     char *sql_part = "SELECT Skill.skill, Profile.name FROM Profile INNER JOIN Skill ON Skill.email = Profile.email WHERE Profile.city = '%s'";
     char sql[strlen(sql_part) + strlen(city)];
-    
+
     sprintf(sql, sql_part, city);
-    
+
     execute_sql(sql);
 }
 
@@ -457,9 +448,9 @@ void opt_add_skill_to_profile_sql(char *email, char *skill) {
     current_opt = 3;
     char *sql_part = "INSERT INTO Skill VALUES('%s','%s')";
     char sql[strlen(sql_part) + strlen(email) + strlen(skill)];
-    
+
     sprintf(sql, sql_part, email, skill);
-    
+
     execute_sql(sql);
 }
 
@@ -467,15 +458,15 @@ void opt_get_experience_from_profile_sql(char *email) {
     current_opt = 4;
     char *sql_part = "SELECT experience FROM Experience WHERE email = '%s'";
     char sql[strlen(sql_part) + strlen(email)];
-    
+
     sprintf(sql, sql_part, email);
-    
+
     execute_sql(sql);
 }
 
 void opt_get_profiles_sql() {
     current_opt = 5;
-    char *sql = 
+    char *sql =
         "SELECT Profile.email, Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
         "FROM Profile "
         "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
@@ -488,7 +479,7 @@ void opt_get_profiles_sql() {
 
 void opt_get_profile_sql(char *email) {
     current_opt = 6;
-    char *sql_part = 
+    char *sql_part =
         "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
         "FROM Profile "
         "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
@@ -497,9 +488,9 @@ void opt_get_profile_sql(char *email) {
         "ON Profile.email = Experiences.email "
         "WHERE Profile.email = '%s';";
     char sql[strlen(sql_part) + strlen(email)];
-    
+
     sprintf(sql, sql_part, email);
-    
+
     execute_sql(sql);
 }
 
@@ -510,35 +501,35 @@ void init_db() {
         exit(1);
     }
 
-    char *sql = 
-        "DROP TABLE IF EXISTS Profile;" 
-        "DROP TABLE IF EXISTS Skill;" 
-        "DROP TABLE IF EXISTS Experience;" 
-        
+    char *sql =
+        "DROP TABLE IF EXISTS Profile;"
+        "DROP TABLE IF EXISTS Skill;"
+        "DROP TABLE IF EXISTS Experience;"
+
         "CREATE TABLE Profile(email TEXT PRIMARY KEY, name TEXT, surname TEXT, city TEXT, education TEXT);" //FIXME add picture
         "CREATE TABLE Skill(email TEXT, skill TEXT, PRIMARY KEY (email, skill));"
         "CREATE TABLE Experience(email TEXT, experience TEXT, PRIMARY KEY (email, experience));"
-        
-        "INSERT INTO Profile VALUES('uno@mail.com','Uno','Dos','Campinas','Linguistics');" 
-        "INSERT INTO Profile VALUES('tres@mail.com','Tres','Cuatro','Campinas','CS');" 
-        "INSERT INTO Profile VALUES('cinco@mail.com','Cinco','Seis','Seattle','CS');" 
-        
-        "INSERT INTO Skill VALUES('uno@mail.com','Acoustic Engineering');" 
-        "INSERT INTO Skill VALUES('uno@mail.com','English');" 
-        "INSERT INTO Skill VALUES('tres@mail.com','Read');" 
-        "INSERT INTO Skill VALUES('tres@mail.com','Write');" 
-        "INSERT INTO Skill VALUES('tres@mail.com','Code');" 
-        "INSERT INTO Skill VALUES('cinco@mail.com','Spanish');" 
-        "INSERT INTO Skill VALUES('cinco@mail.com','English');" 
-        "INSERT INTO Skill VALUES('cinco@mail.com','Reap');" 
-        "INSERT INTO Skill VALUES('cinco@mail.com','Sow');" 
-        
-        "INSERT INTO Experience VALUES('uno@mail.com','Work');" 
-        "INSERT INTO Experience VALUES('uno@mail.com','Research');" 
-        "INSERT INTO Experience VALUES('tres@mail.com','Work');" 
-        "INSERT INTO Experience VALUES('tres@mail.com','Study');" 
-        "INSERT INTO Experience VALUES('cinco@mail.com','Study');" 
-        "INSERT INTO Experience VALUES('cinco@mail.com','Work');" 
+
+        "INSERT INTO Profile VALUES('uno@mail.com','Uno','Dos','Campinas','Linguistics');"
+        "INSERT INTO Profile VALUES('tres@mail.com','Tres','Cuatro','Campinas','CS');"
+        "INSERT INTO Profile VALUES('cinco@mail.com','Cinco','Seis','Seattle','CS');"
+
+        "INSERT INTO Skill VALUES('uno@mail.com','Acoustic Engineering');"
+        "INSERT INTO Skill VALUES('uno@mail.com','English');"
+        "INSERT INTO Skill VALUES('tres@mail.com','Read');"
+        "INSERT INTO Skill VALUES('tres@mail.com','Write');"
+        "INSERT INTO Skill VALUES('tres@mail.com','Code');"
+        "INSERT INTO Skill VALUES('cinco@mail.com','Spanish');"
+        "INSERT INTO Skill VALUES('cinco@mail.com','English');"
+        "INSERT INTO Skill VALUES('cinco@mail.com','Reap');"
+        "INSERT INTO Skill VALUES('cinco@mail.com','Sow');"
+
+        "INSERT INTO Experience VALUES('uno@mail.com','Work');"
+        "INSERT INTO Experience VALUES('uno@mail.com','Research');"
+        "INSERT INTO Experience VALUES('tres@mail.com','Work');"
+        "INSERT INTO Experience VALUES('tres@mail.com','Study');"
+        "INSERT INTO Experience VALUES('cinco@mail.com','Study');"
+        "INSERT INTO Experience VALUES('cinco@mail.com','Work');"
         "INSERT INTO Experience VALUES('cinco@mail.com','Study more');";
 
     execute_sql(sql);

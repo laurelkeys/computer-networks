@@ -45,18 +45,18 @@ int send_wrapper(int file_descriptor, char *message, int verbose) {
     int n;
     while (bytes_sent < msg_size) {
         n = send(file_descriptor, buffer + bytes_sent, bytes_left, 0);
-        if (n == -1) { 
+        if (n == -1) {
             perror("send_wrapper: common: send");
-            break; 
+            break;
         } else if (n <= 0) {
             perror("send_wrapper: common: n <= 0");
-            break; 
+            break;
         }
 
         bytes_sent += n;
         bytes_left -= n;
     }
-    
+
     return bytes_left; // return # of unsent bytes
 }
 
@@ -71,12 +71,12 @@ int send_img_wrapper(int file_descriptor, char *message, int msg_size, int verbo
     int bytes_left = HEADER_SIZE - 1; // how many we have left to send
     while (bytes_sent < HEADER_SIZE - 1) {
         n = send(file_descriptor, header + bytes_sent, bytes_left, 0);
-        if (n == -1) { 
+        if (n == -1) {
             perror("send_img_wrapper: common: send");
-            break; 
+            break;
         } else if (n <= 0) {
             perror("send_img_wrapper: common: n <= 0");
-            break; 
+            break;
         }
 
         bytes_sent += n;
@@ -90,12 +90,12 @@ int send_img_wrapper(int file_descriptor, char *message, int msg_size, int verbo
     bytes_left = msg_size;
     while (bytes_sent < msg_size) {
         n = send(file_descriptor, message + bytes_sent, bytes_left, 0);
-        if (n == -1) { 
+        if (n == -1) {
             perror("send_img_wrapper: common: send");
-            break; 
+            break;
         } else if (n <= 0) {
             perror("send_img_wrapper: common: n <= 0");
-            break; 
+            break;
         }
 
         bytes_sent += n;
@@ -123,13 +123,13 @@ int recv_wrapper(int file_descriptor, char **buffer, int verbose) {
     int n;
     while (bytes_received < HEADER_SIZE - 1) {
         n = recv(file_descriptor, header_buffer + bytes_received, HEADER_SIZE - 1 - bytes_received, 0);
-        if (n == -1) { 
+        if (n == -1) {
             perror("recv_wrapper: common: header recv");
             break;
         } else if (n <= 0) {
             perror("recv_wrapper: common: header n <= 0");
             printf("n=%d", n);
-            break; 
+            break;
         }
 
         bytes_received += n;
@@ -147,12 +147,12 @@ int recv_wrapper(int file_descriptor, char **buffer, int verbose) {
     bytes_received = 0;
     while (bytes_received < msg_size) {
         n = recv(file_descriptor, (*buffer) + bytes_received, msg_size - bytes_received, 0);
-        if (n == -1) { 
+        if (n == -1) {
             perror("recv_wrapper: common: msg recv");
-            break; 
+            break;
         } else if (n <= 0) {
             perror("recv_wrapper: common: n <= 0");
-            break; 
+            break;
         }
 
         bytes_received += n;
@@ -172,12 +172,12 @@ int recv_img_wrapper(int file_descriptor, char **buffer, int *size, int verbose)
     int n;
     while (bytes_received < HEADER_SIZE - 1) {
         n = recv(file_descriptor, header_buffer + bytes_received, HEADER_SIZE - 1 - bytes_received, 0);
-        if (n == -1) { 
+        if (n == -1) {
             perror("recv_img_wrapper: common: header recv");
             break;
         } else if (n <= 0) {
             perror("recv_img_wrapper: common: header n <= 0");
-            break; 
+            break;
         }
 
         bytes_received += n;
@@ -195,12 +195,12 @@ int recv_img_wrapper(int file_descriptor, char **buffer, int *size, int verbose)
     bytes_received = 0;
     while (bytes_received < msg_size) {
         n = recv(file_descriptor, (*buffer) + bytes_received, msg_size - bytes_received, 0);
-        if (n == -1) { 
+        if (n == -1) {
             perror("recv_img_wrapper: common: msg recv");
-            break; 
+            break;
         } else if (n <= 0) {
             perror("recv_img_wrapper: common: n <= 0");
-            break; 
+            break;
         }
 
         bytes_received += n;
@@ -214,14 +214,14 @@ int recv_img_wrapper(int file_descriptor, char **buffer, int *size, int verbose)
     return msg_size - bytes_received; // return # of bytes not received
 }
 
-char *picture_name_from_email(char *email) {
-    char *img_file_name = malloc(sizeof(char) * strlen(email));
-    int i, j = 0;
-    for (i = 0; i < strlen(email); i++) {
-        if (email[i] != '.') {
-            img_file_name[j++] = email[i];
-        }
-    }
-    img_file_name[j] = '\0';
-    return img_file_name;
-}
+// char *picture_name_from_email(char *email) {
+//     char *img_file_name = malloc(sizeof(char) * strlen(email));
+//     int i, j = 0;
+//     for (i = 0; i < strlen(email); i++) {
+//         if (email[i] != '.') {
+//             img_file_name[j++] = email[i];
+//         }
+//     }
+//     img_file_name[j] = '\0';
+//     return img_file_name;
+// }

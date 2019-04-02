@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     struct addrinfo *server_addrinfo;
     get_server_addrinfo(argv[1], PORT, &server_addrinfo);
 
-    // connects the socket referred to by socket_file_descriptor 
+    // connects the socket referred to by socket_file_descriptor
     // to the first matching specified address in server_addrinfo (i.e. connected_addrinfo)
     int socket_file_descriptor;
     struct addrinfo *connected_addrinfo;
@@ -137,7 +137,7 @@ void opt_get_skills_filtering_city(int socket_file_descriptor) {
     // Read and send input
     int return_value;
     char input_buffer[MAX_INPUT_SIZE];
-    return_value = get_input("Digite a cidade> ", input_buffer, sizeof(input_buffer));    
+    return_value = get_input("Digite a cidade> ", input_buffer, sizeof(input_buffer));
     if (validate_input(return_value, "\nCidade não digitada", "Nome muito longo ", input_buffer) != OK)
         return;
     send_wrapper(socket_file_descriptor, input_buffer, v);
@@ -162,13 +162,13 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
     // Read and send input
     int return_value;
     char input_buffer_email[MAX_INPUT_SIZE];
-    return_value = get_input("Digite o email do perfil> ", input_buffer_email, sizeof(input_buffer_email));    
+    return_value = get_input("Digite o email do perfil> ", input_buffer_email, sizeof(input_buffer_email));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer_email) != OK)
         return;
     send_wrapper(socket_file_descriptor, input_buffer_email, v);
     // TODO verify if the profile exists before asking for the skill
     char input_buffer_skill[MAX_INPUT_SIZE];
-    return_value = get_input("Digite a habilidade> ", input_buffer_skill, sizeof(input_buffer_skill));    
+    return_value = get_input("Digite a habilidade> ", input_buffer_skill, sizeof(input_buffer_skill));
     if (validate_input(return_value, "\nHabilidade não digitada", "Nome muito longo ", input_buffer_skill) != OK)
         return;
     send_wrapper(socket_file_descriptor, input_buffer_skill, v);
@@ -195,7 +195,7 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
     // Read and send input
     int return_value;
     char input_buffer[MAX_INPUT_SIZE];
-    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));    
+    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
     send_wrapper(socket_file_descriptor, input_buffer, v);
@@ -256,7 +256,7 @@ void opt_get_profile(int socket_file_descriptor) {
     // Read and send input
     int return_value;
     char input_buffer[MAX_INPUT_SIZE];
-    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));    
+    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
     send_wrapper(socket_file_descriptor, input_buffer, v);
@@ -266,7 +266,7 @@ void opt_get_profile(int socket_file_descriptor) {
     // Print result
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("\n%s\n", buffer);
-    
+
     // Save result
     char header[256];
     snprintf(header, sizeof(header), "--> (6) email: %s\n", input_buffer);
@@ -277,7 +277,7 @@ void opt_get_profile(int socket_file_descriptor) {
     int img_size;
     recv_img_wrapper(socket_file_descriptor, &buffer, &img_size, v);
 
-    char *img_file_name = picture_name_from_email(input_buffer);
+    char *img_file_name = input_buffer;
     save_img(img_file_name, buffer, img_size);
     free(img_file_name);
     free(buffer);
