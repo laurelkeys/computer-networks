@@ -306,12 +306,8 @@ void opt_get_profile(int socket_file_descriptor) {
     }
 
     // Send img
-    char *img_file_name = email;
-    free(email);
-
-    char img_file_path[strlen(img_file_name) + 11];
-    sprintf(img_file_path, "./imgs/%s.png", img_file_name);
-    free(img_file_name);
+    char img_file_path[strlen(email) + 11];
+    sprintf(img_file_path, "./imgs/%s.png", email);
 
     FILE *img_file = fopen(img_file_path, "rb");
     if (img_file) {
@@ -321,6 +317,7 @@ void opt_get_profile(int socket_file_descriptor) {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
     }
 
+    free(email);
 }
 
 // CONNECTION ///////////////////////////
