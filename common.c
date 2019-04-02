@@ -1,5 +1,14 @@
 #include "common.h"
 
+void log_timestamp(char *label) {
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    FILE *f;
+    f = fopen(FILE_TIMESTAMPS,"a");
+    fprintf(f, "%s:%ldus", label, t.tv_usec);
+    fclose(f);
+}
+
 static char* _msg_size_to_str(int size) {
     char *result = malloc(sizeof(char) * HEADER_SIZE);
     *(result + HEADER_SIZE - 2) = ';';

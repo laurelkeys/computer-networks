@@ -11,5 +11,6 @@ int recv_wrapper(int file_descriptor, char **buffer, int verbose);
 int send_img_wrapper(int file_descriptor, char * message, int msg_size, int verbose);
 int recv_img_wrapper(int file_descriptor, char **buffer, int *size, int verbose);
 char *picture_name_from_email(char *email);
+void log_timestamp(char *label);
 
 #endif

@@ -69,7 +69,6 @@ void receive_messages(int socket_file_descriptor) {
     int numbytes; // length of the message written to the buffer
     char *buffer;
     char opt;
-    struct timeval tv3, tv4;
 
     while (true) {
         recv_wrapper(socket_file_descriptor, &buffer, v);
@@ -79,7 +78,7 @@ void receive_messages(int socket_file_descriptor) {
 
         if (opt == OPT_QUIT_STR[0]) break; // FIXME
 
-        gettimeofday(&tv3, NULL);
+        log_timestamp("Server:Received opt");
         switch (opt - '0') {
             case 1: opt_get_profiles_filtering_education(socket_file_descriptor);
             break;
@@ -94,8 +93,7 @@ void receive_messages(int socket_file_descriptor) {
             case 6: opt_get_profile(socket_file_descriptor);
             break;
         }
-        gettimeofday(&tv4, NULL);
-        printf("TEMPO DE PROCESSAMENTO: %ldus\n", tv4.tv_usec-tv3.tv_usec);
+        log_timestamp("Server:Finished processing");
     }
 }
 
@@ -159,36 +157,44 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     // (1) listar todas as pessoas formadas em um determinado curso
     printf("server: client selected option 1:\n");
 
+    log_timestamp("Server:Waiting for education");
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("server: education '%s'\n", buffer);
 
+    log_timestamp("Server:Received education, running query");
     opt_get_profiles_filtering_education_sql(buffer); // queries database
     free(buffer);
+    log_timestamp("Server:Query result, now sending to client");
 
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("Server:Sent to client");
 }
 
 void opt_get_skills_filtering_city(int socket_file_descriptor) {
     // (2) listar as habilidades dos perfis que moram em uma determinada cidade
     printf("server: client selected option 2:\n");
 
+    log_timestamp("Server:Waiting for city");
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("server: city '%s'\n", buffer);
 
+    log_timestamp("Server:Received city, running query");
     opt_get_skills_filtering_city_sql(buffer); // queries database
     free(buffer);
 
+    log_timestamp("Server:Query result, now sending to client");
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("Server:Sent to client");
 }
 
 void opt_add_skill_to_profile(int socket_file_descriptor) {
@@ -227,6 +233,7 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("Server:Sent to client");
 }
 
 void opt_get_profiles(int socket_file_descriptor) {
@@ -240,6 +247,7 @@ void opt_get_profiles(int socket_file_descriptor) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("Server:Sent to client");
 
     // get list of emails and send their pictures
     char *emails;
@@ -304,6 +312,7 @@ void opt_get_profile(int socket_file_descriptor) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("Server:Sent to client");
 
     // Send img
     char *img_file_name = picture_name_from_email(email);
