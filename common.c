@@ -73,7 +73,7 @@ int send_img_wrapper(int file_descriptor, char *message, int msg_size, int verbo
         bytes_sent += n;
         bytes_left -= n;
     }
-    printf("%s\n", header);
+    if (verbose) printf("%s\n", header);
     free(header);
 
     // Send picture
@@ -119,6 +119,7 @@ int recv_wrapper(int file_descriptor, char **buffer, int verbose) {
             break;
         } else if (n <= 0) {
             perror("recv_wrapper: common: header n <= 0");
+            printf("n=%d", n);
             break; 
         }
 

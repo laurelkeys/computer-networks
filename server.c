@@ -129,7 +129,6 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     if (file_size == 0) {
         send_wrapper(socket_file_descriptor, "No results", v);
     } else {
-
         char text[file_size + 1];
         text[0] = '\0';
         char buffer[file_size + 1];
@@ -149,7 +148,7 @@ void send_picture_to_client(int socket_file_descriptor, FILE *f) {
 
     int i;
     char img_buffer[file_size + 1];
-    for(i = 0; i < sizeof(img_buffer); i++) {
+    for (i = 0; i < sizeof(img_buffer); i++) {
         fread(img_buffer + i, 1, 1, f);
     }
     
@@ -242,7 +241,51 @@ void opt_get_profiles(int socket_file_descriptor) {
         fclose(f);
     }
 
-    // TODO get list of emails and send their pictures
+    // get list of emails and send their pictures
+    char *emails;
+    char *email;
+    get_all_emails_sql(&emails);
+    int end = 0;
+    int begin = 0;
+    int cut;
+    // printf("Get profiles sending pics - all emails:''%s''\n", emails);
+    // printf("Get profiles sending pics - size(all emails):%ld\n", strlen(emails));
+    while (end < strlen(emails) && *(emails+end) != '\0') {
+        // Put "email = XXXXXXX@XXXX.com" in the buffer
+        while (*(emails+end) != '\n') end++; 
+        email = malloc(end-begin+5);
+        strncpy(email, emails+begin, end-begin);
+        
+        email[1] = '.';
+        email[2] = '/';
+        email[3] = 'i';
+        email[4] = 'm';
+        email[5] = 'g';
+        email[6] = 's';
+        email[7] = '/';
+        email[end-begin] = '.';
+        email[end-begin+1] = 'p';
+        email[end-begin+2] = 'n';
+        email[end-begin+3] = 'g';
+        email[end-begin+4] = '\0';
+
+        f = fopen((email+1),"rb"); 
+        printf("server: uploading picture to client: %s\n", (email+1));
+        email[end-begin] = '\0';
+        if (f) {
+            send_wrapper(socket_file_descriptor, (email+8), v);
+            send_picture_to_client(socket_file_descriptor, f);
+            fclose(f);
+            // printf("Sent img\n");
+        } else {
+            printf("server: img_file not found (path: '%s')\n", f);
+        }
+        free(email);
+        end += 2;
+        begin = end;
+    }
+    free(emails);
+    send_wrapper(socket_file_descriptor, "THATS ALL;", v);
 }
 
 // FIXME
@@ -358,6 +401,26 @@ int send_info_callback(void *not_used, int length, char **column_content, char *
     return 0;
 }
 
+void get_all_emails_sql(char **emails) {
+    current_opt = 1;
+    char *sql = "SELECT Profile.email FROM Profile;";
+
+    execute_sql(sql);
+
+    FILE *f = fopen(FILE_SERVER, "r");
+
+    fseek(f, 0, SEEK_END);
+    long file_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    *emails = malloc(file_size + 1);
+    for (int i = 0; i < file_size; i++) {
+        fread(*emails + i, 1, 1, f);
+    }
+    fclose(f);
+    *((*emails)+file_size) = '\0';
+}
+
 void opt_get_profiles_filtering_education_sql(char *education) {
     current_opt = 1;
     char *sql_part = "SELECT name FROM Profile WHERE education = '%s'";
@@ -401,7 +464,7 @@ void opt_get_experience_from_profile_sql(char *email) {
 void opt_get_profiles_sql() {
     current_opt = 5;
     char *sql = 
-        "SELECT Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
+        "SELECT Profile.email, Profile.name, Profile.surname, Profile.city, Profile.education, Skills.skills, Experiences.experiences "
         "FROM Profile "
         "INNER JOIN (SELECT Skill.email, GROUP_CONCAT(Skill.skill, ', ') AS skills FROM Skill GROUP BY Skill.email) AS Skills "
         "ON Profile.email = Skills.email "

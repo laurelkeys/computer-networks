@@ -38,5 +38,6 @@ void opt_add_skill_to_profile_sql(char * email, char * skill);
 void opt_get_experience_from_profile_sql(char * email);
 void opt_get_profiles_sql();
 void opt_get_profile_sql(char * email);
+void get_all_emails_sql(char **emails);
 
 #endif

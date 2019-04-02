@@ -228,6 +228,25 @@ void opt_get_profiles(int socket_file_descriptor) {
     free(buffer);
 
     // TODO save pictures
+    char *name;
+    int img_size;
+    recv_wrapper(socket_file_descriptor, &name, v);
+    // printf("All profiles name - ''%s''\n", name);
+    while (strcmp(name,"THATS ALL;\0")) {
+        // Save picture
+        recv_img_wrapper(socket_file_descriptor, &buffer, &img_size, v);
+        save_img(name, buffer, img_size);
+        free(buffer);
+
+        printf("Picture downloaded: %s\n", name);
+
+        // Get next name or finish message
+        free(name);
+        recv_wrapper(socket_file_descriptor, &name, v);
+        // printf("All profiles name - ''%s''\n", name);
+    }
+    printf("\n");
+    free(name);
 }
 
 void opt_get_profile(int socket_file_descriptor) {
