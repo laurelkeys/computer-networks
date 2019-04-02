@@ -257,7 +257,10 @@ void opt_get_profile(int socket_file_descriptor) {
     // Save picture
     int img_size;
     recv_img_wrapper(socket_file_descriptor, &buffer, &img_size, v);
-    save_img(input_buffer, buffer, img_size);
+
+    char *img_file_name = picture_name_from_email(input_buffer);
+    save_img(img_file_name, buffer, img_size);
+    free(img_file_name);
     free(buffer);
 }
 

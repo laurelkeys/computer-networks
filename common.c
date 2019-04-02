@@ -203,3 +203,15 @@ int recv_img_wrapper(int file_descriptor, char **buffer, int *size, int verbose)
     *size = msg_size;
     return msg_size - bytes_received; // return # of bytes not received
 }
+
+char *picture_name_from_email(char *email) {
+    char *img_file_name = malloc(sizeof(char) * strlen(email));
+    int i, j = 0;
+    for (i = 0; i < strlen(email); i++) {
+        if (email[i] != '.') {
+            img_file_name[j++] = email[i];
+        }
+    }
+    img_file_name[j] = '\0';
+    return img_file_name;
+}

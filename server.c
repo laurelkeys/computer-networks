@@ -258,9 +258,12 @@ void opt_get_profile(int socket_file_descriptor) {
     }
 
     // Send img
-    char img_file_path[strlen(email) + 11];
-    sprintf(img_file_path, "./imgs/%s.png", email);
+    char *img_file_name = picture_name_from_email(email);
     free(email);
+    
+    char img_file_path[strlen(img_file_name) + 11];
+    sprintf(img_file_path, "./imgs/%s.png", img_file_name);
+    free(img_file_name);
 
     FILE *img_file = fopen(img_file_path, "rb");
     if (img_file) {
