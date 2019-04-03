@@ -11,7 +11,7 @@ PATH_TIMESTAMPS_FILE = 'timestamps.txt'
 PATH_TIMESTAMPS_FOLDER = './timestamps/'
 HOST_NAME = 'localhost'
 
-RUNS = 50 # How many times each operation should be run
+RUNS = 1 # How many times each operation should be run
 
 
 
@@ -35,13 +35,17 @@ for input_path in input_list:
         query = "./client " + HOST_NAME + " < " + PATH_TESTS + input_path
         print(query)
         # "./client", HOST_NAME, " < ", PATH_TESTS, input_path
-        process = Popen(["./client", HOST_NAME, " < ", PATH_TESTS, input_path],
+        process = Popen([query],#"./client", HOST_NAME, "<", PATH_TESTS, input_path],
                     stdout=PIPE,
-                    stderr=STDOUT)
-        # out = process.stdout.read()
+                    stderr=STDOUT,
+                    shell=True)#.communicate() 
+        out = process.stdout.read()
+        print(out)
+        print("================================\n")
 
     # Copy timestamps file
-    copyfile(PATH_TIMESTAMPS_FILE, PATH_TIMESTAMPS_FOLDER + input_path[:2] + "txt")
+    copyfile(PATH_TIMESTAMPS_FILE, PATH_TIMESTAMPS_FOLDER + input_path[:-3] + ".txt")
+    print("Copied to :"+ input_path[:-3] + ".txt")
     print("Done with " + input_path)
 
 print("Done")
