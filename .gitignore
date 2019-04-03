@@ -12,6 +12,7 @@
 *.png
 *.jpg
 *.jpeg
+!imgs/*.png
 ./timestamps
 
 # Prerequisites
