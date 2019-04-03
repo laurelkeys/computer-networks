@@ -236,7 +236,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     save_result_to_file("--> (5)\n", buffer);
     free(buffer);
 
-    // TODO save pictures
+    // save pictures
     char *name;
     int img_size;
     recv_wrapper(socket_file_descriptor, &name, v);
@@ -254,7 +254,7 @@ void opt_get_profiles(int socket_file_descriptor) {
         recv_wrapper(socket_file_descriptor, &name, v);
         // printf("All profiles name - ''%s''\n", name);
     }
-    log_timestamp("client:opt5:after result receive");
+    log_timestamp("client:opt5:after result receive\n\n");
     printf("\n");
     free(name);
 }

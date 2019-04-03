@@ -1,6 +1,7 @@
 from statistics import stdev
 from math import sqrt
 from sys import exit
+import matplotlib.pyplot as plt
 
 
 RUNS = 50
@@ -28,6 +29,10 @@ def get_timestamp(haystack, needle, from_index=0):
 
 def file_name(opt):
     return PATH_TIMESTAMPS_FOLDER + "opt" + str(opt) + ".txt"
+
+def clean_array(array):
+    a = sorted(array)
+    return a[5:-5]
 
 
 times_communication = [[0]*RUNS]*7
@@ -57,24 +62,28 @@ for opt in range(1,7):
             total_time = (t3-t0)
             communication_time = total_time - query_time
 
-            if query_time < 0:
+            if query_time < 0 or total_time < 0 or communication_time < 0:
                 if run > 0:
                     query_time = times_query[opt][run-1]
-                else:
-                    print("Inconsistent time - query: opt:"+str(opt)+": run:"+str(run))
-                    exit(0)
-            if total_time < 0:
-                if run > 0:
                     total_time = times_communication[opt][run-1] + times_query[opt][run-1]
-                else:
-                    print("Inconsistent time - total: opt:"+str(opt)+": run:"+str(run))
-                    exit(0)
-            if communication_time <= 0:
-                if run > 0:
                     communication_time = times_communication[opt][run-1]
                 else:
+                    print("Inconsistent time - query: opt:"+str(opt)+": run:"+str(run))
+                    print("Inconsistent time - total: opt:"+str(opt)+": run:"+str(run))
                     print("Inconsistent time - communication: opt:"+str(opt)+": run:"+str(run))
                     exit(0)
+            # if total_time < 0:
+            #     if run > 0:
+            #         total_time = times_communication[opt][run-1] + times_query[opt][run-1]
+            #     else:
+            #         print("Inconsistent time - total: opt:"+str(opt)+": run:"+str(run))
+            #         exit(0)
+            # if communication_time <= 0:
+            #     if run > 0:
+            #         communication_time = times_communication[opt][run-1]
+            #     else:
+            #         print("Inconsistent time - communication: opt:"+str(opt)+": run:"+str(run))
+            #         exit(0)
 
             times_query[opt][run] = query_time
             times_communication[opt][run] = communication_time
@@ -83,11 +92,24 @@ for opt in range(1,7):
                 print("Communication time #" + str(run) + ":" + str(communication_time))
     
     print("==================#"+str(opt)+"#==================")
-    average = sum(times_communication[opt])/RUNS
+    times_communication[opt] = clean_array(times_communication[opt])
+    times_query[opt] = clean_array(times_query[opt])
+
+    average = sum(times_communication[opt])/len(times_communication[opt])
     print("Average communication time of #" + str(opt) + ": " + str(average))
     deviation = stdev(times_communication[opt])
     print("Standard Deviation of #" + str(opt) + ": " + str(deviation))
-    delta = calculate_confidence_inteval(deviation, RUNS)
-    print("95% conficence interval: " + str(average-delta) + " to " + str(average+delta))
-    query_avg = sum(times_query[opt])/RUNS
+    delta = calculate_confidence_inteval(deviation, len(times_communication[opt]))
+    print("95% conficence interval: " + str(average-(2*delta)) + " to " + str(average+(2*delta)))
+    query_avg = sum(times_query[opt])/len(times_query[opt])
     print("Average query time of #" + str(opt) + ": " + str(query_avg) + "\n")
+
+    plt.scatter([opt]*len(times_communication[opt]), times_communication[opt], c='cyan')
+    plt.scatter(opt, average, c='r', marker='x')
+    plt.scatter(opt, average+(2*delta), c='black', marker='_')
+    plt.scatter(opt, average-(2*delta), c='black', marker='_')
+
+plt.xlabel('Opção', fontsize=12)
+plt.ylabel('Tempo (us)', fontsize=11)
+plt.savefig('graph_communication.png')
+plt.show()
