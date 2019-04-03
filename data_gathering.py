@@ -1,9 +1,10 @@
 from statistics import stdev
 from math import sqrt
+from sys import exit
 
 
-RUNS = 3
-VERBOSE = True
+RUNS = 50
+VERBOSE = False
 PATH_TIMESTAMPS_FOLDER = './timestamps/'
 
 
@@ -29,8 +30,9 @@ def file_name(opt):
     return PATH_TIMESTAMPS_FOLDER + "opt" + str(opt) + ".txt"
 
 
-times = [[0]*RUNS]*7
-for opt in range(1,2):
+times_communication = [[0]*RUNS]*7
+times_query = [[0]*RUNS]*7
+for opt in range(1,7):
     from_index0 = 0
     from_index1 = 0
     from_index2 = 0
@@ -51,15 +53,41 @@ for opt in range(1,2):
             if from_index3 == -1:
                 continue
 
-            communication_time = (t3-t0) - (t2-t1)
-            times[opt][run] = communication_time
+            query_time = (t2-t1)
+            total_time = (t3-t0)
+            communication_time = total_time - query_time
+
+            if query_time < 0:
+                if run > 0:
+                    query_time = times_query[opt][run-1]
+                else:
+                    print("Inconsistent time - query: opt:"+str(opt)+": run:"+str(run))
+                    exit(0)
+            if total_time < 0:
+                if run > 0:
+                    total_time = times_communication[opt][run-1] + times_query[opt][run-1]
+                else:
+                    print("Inconsistent time - total: opt:"+str(opt)+": run:"+str(run))
+                    exit(0)
+            if communication_time <= 0:
+                if run > 0:
+                    communication_time = times_communication[opt][run-1]
+                else:
+                    print("Inconsistent time - communication: opt:"+str(opt)+": run:"+str(run))
+                    exit(0)
+
+            times_query[opt][run] = query_time
+            times_communication[opt][run] = communication_time
 
             if VERBOSE: 
                 print("Communication time #" + str(run) + ":" + str(communication_time))
     
-    average = sum(times[opt])/len(times[opt])
-    print("Average time of #" + str(opt) + ": " + str(average))
-    deviation = stdev(times[opt])
+    print("==================#"+str(opt)+"#==================")
+    average = sum(times_communication[opt])/RUNS
+    print("Average communication time of #" + str(opt) + ": " + str(average))
+    deviation = stdev(times_communication[opt])
     print("Standard Deviation of #" + str(opt) + ": " + str(deviation))
     delta = calculate_confidence_inteval(deviation, RUNS)
-    print("95% conficence interval: " + str(average-delta) + " to " + str(average+delta) + "\n")
+    print("95% conficence interval: " + str(average-delta) + " to " + str(average+delta))
+    query_avg = sum(times_query[opt])/RUNS
+    print("Average query time of #" + str(opt) + ": " + str(query_avg) + "\n")
