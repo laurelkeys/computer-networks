@@ -31,21 +31,24 @@ def file_name(opt):
 
 times = [[0]*RUNS]*7
 for opt in range(1,2):
-    from_index = 0
+    from_index0 = 0
+    from_index1 = 0
+    from_index2 = 0
+    from_index3 = 0
     with open(file_name(opt),'r') as file:
         string = file.read()
         for run in range(RUNS):
-            t0, from_index = get_timestamp(string, "client:opt"+str(opt)+":before input send:", from_index)
-            if from_index == -1:
+            t0, from_index0 = get_timestamp(string, "client:opt"+str(opt)+":before input send:", from_index0)
+            if from_index0 == -1:
                 continue
-            t1, from_index = get_timestamp(string, "server:opt"+str(opt)+":before query:", from_index)
-            if from_index == -1:
+            t1, from_index1 = get_timestamp(string, "server:opt"+str(opt)+":before query:", from_index1)
+            if from_index1 == -1:
                 continue
-            t2, from_index = get_timestamp(string, "server:opt"+str(opt)+":after query:", from_index)
-            if from_index == -1:
+            t2, from_index2 = get_timestamp(string, "server:opt"+str(opt)+":after query:", from_index2)
+            if from_index2 == -1:
                 continue
-            t3, from_index = get_timestamp(string, "client:opt"+str(opt)+":after result receive\n\n:", from_index)
-            if from_index == -1:
+            t3, from_index3 = get_timestamp(string, "client:opt"+str(opt)+":after result receive\n\n:", from_index3)
+            if from_index3 == -1:
                 continue
 
             communication_time = (t3-t0) - (t2-t1)
