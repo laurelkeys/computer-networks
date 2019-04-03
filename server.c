@@ -79,7 +79,7 @@ void receive_messages(int socket_file_descriptor) {
 
         if (opt == OPT_QUIT_STR[0]) break; // FIXME
 
-        gettimeofday(&tv3, NULL);
+        log_timestamp("server:before opt");
         switch (opt - '0') {
             case 1: opt_get_profiles_filtering_education(socket_file_descriptor);
             break;
@@ -94,8 +94,7 @@ void receive_messages(int socket_file_descriptor) {
             case 6: opt_get_profile(socket_file_descriptor);
             break;
         }
-        gettimeofday(&tv4, NULL);
-        printf("TEMPO DE PROCESSAMENTO: %ldus\n", tv4.tv_usec-tv3.tv_usec);
+        log_timestamp("server:after all");
     }
 }
 
@@ -159,42 +158,51 @@ void opt_get_profiles_filtering_education(int socket_file_descriptor) {
     // (1) listar todas as pessoas formadas em um determinado curso
     printf("server: client selected option 1:\n");
 
+    log_timestamp("server:opt1:before input");
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("server: education '%s'\n", buffer);
 
+    log_timestamp("server:opt1:after input");
     opt_get_profiles_filtering_education_sql(buffer); // queries database
     free(buffer);
 
+    log_timestamp("server:opt1:before send");
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("server:opt1:after send");
 }
 
 void opt_get_skills_filtering_city(int socket_file_descriptor) {
     // (2) listar as habilidades dos perfis que moram em uma determinada cidade
     printf("server: client selected option 2:\n");
 
+    log_timestamp("server:opt2:before input");
     char *buffer;
     recv_wrapper(socket_file_descriptor, &buffer, v);
     printf("server: city '%s'\n", buffer);
+    log_timestamp("server:opt2:after input");
 
     opt_get_skills_filtering_city_sql(buffer); // queries database
     free(buffer);
 
+    log_timestamp("server:opt2:before send");
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("server:opt2:after send");
 }
 
 void opt_add_skill_to_profile(int socket_file_descriptor) {
     // (3) acrescentar uma nova experiência em um perfil
     printf("server: client selected option 3:\n");
 
+    log_timestamp("server:opt3:before input");
     char *email;
     recv_wrapper(socket_file_descriptor, &email, v);
     printf("server: email '%s'\n", email);
@@ -202,44 +210,54 @@ void opt_add_skill_to_profile(int socket_file_descriptor) {
     char *skill;
     recv_wrapper(socket_file_descriptor, &skill, v);
     printf("server: skill '%s'\n", skill);
+    log_timestamp("server:opt3:after input");
 
     opt_add_skill_to_profile_sql(email, skill); // queries database
     free(email);
     free(skill);
 
-    // TODO send a 'success' message
-    // send_file_to_client(socket_file_descriptor, fopen(FILE_SERVER, "r"));
+    // send a 'success' message
+    log_timestamp("server:opt3:before send");
+    send_wrapper(socket_file_descriptor, "Successfully included\n", v);
+    log_timestamp("server:opt3:after send");
 }
 
 void opt_get_experience_from_profile(int socket_file_descriptor) {
     // (4) dado o email do perfil, retornar sua experiência
     printf("server: client selected option 4:\n");
 
+    log_timestamp("server:opt4:before input");
     char *email;
     recv_wrapper(socket_file_descriptor, &email, v);
     printf("server: email '%s'\n", email);
+    log_timestamp("server:opt4:after input");
 
     opt_get_experience_from_profile_sql(email); // queries database
     free(email);
 
+    log_timestamp("server:opt4:before send");
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("server:opt4:after send");
 }
 
 void opt_get_profiles(int socket_file_descriptor) {
     // (5) listar todas as informações de todos os perfis
     printf("server: client selected option 5:\n");
 
+    log_timestamp("server:opt5:before query");
     opt_get_profiles_sql(); // queries database
 
+    log_timestamp("server:opt5:before send");
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("server:opt5:after send");
 
     // get list of emails and send their pictures
     char *emails;
@@ -248,8 +266,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     int end = 0;
     int begin = 0;
     int cut;
-    // printf("Get profiles sending pics - all emails:''%s''\n", emails);
-    // printf("Get profiles sending pics - size(all emails):%ld\n", strlen(emails));
+    log_timestamp("server:opt6:before picture send");
     while (end < strlen(emails) && *(emails+end) != '\0') {
         // Put "email = XXXXXXX@XXXX.com" in the buffer
         while (*(emails+end) != '\n') end++;
@@ -278,12 +295,13 @@ void opt_get_profiles(int socket_file_descriptor) {
             fclose(f);
             // printf("Sent img\n");
         } else {
-            printf("server: img_file not found (path: '%s')\n", f);
+            printf("server: img_file not found (path: '%s')\n", (email+1));
         }
         free(email);
         end += 2;
         begin = end;
     }
+    log_timestamp("server:opt6:after picture send");
     free(emails);
     send_wrapper(socket_file_descriptor, "THATS ALL;", v);
 }
@@ -293,22 +311,27 @@ void opt_get_profile(int socket_file_descriptor) {
     // (6) dado o email de um perfil, retornar suas informações
     printf("server: client selected option 6:\n");
 
+    log_timestamp("server:opt6:before input");
     char *email;
     recv_wrapper(socket_file_descriptor, &email, v);
     printf("server: email '%s'\n", email);
+    log_timestamp("server:opt6:after input");
 
     opt_get_profile_sql(email); // queries database
 
+    log_timestamp("server:opt6:before send");
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
         send_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
+    log_timestamp("server:opt6:after send");
 
     // Send img
     char img_file_path[strlen(email) + 11];
     sprintf(img_file_path, "./imgs/%s.png", email);
 
+    log_timestamp("server:opt6:before picture send");
     FILE *img_file = fopen(img_file_path, "rb");
     if (img_file) {
         send_picture_to_client(socket_file_descriptor, img_file);
@@ -316,7 +339,7 @@ void opt_get_profile(int socket_file_descriptor) {
     } else {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
     }
-
+    log_timestamp("server:opt6:after picture send");
     free(email);
 }
 

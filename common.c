@@ -5,8 +5,10 @@ void log_timestamp(char *label) {
     gettimeofday(&t, NULL);
     FILE *f;
     f = fopen(FILE_TIMESTAMPS,"a");
-    fprintf(f, "%s:%ldus", label, t.tv_usec);
-    fclose(f);
+    if (f) {
+        fprintf(f, "%s:%ldus\n", label, t.tv_usec);
+        fclose(f);
+    }
 }
 
 static char* _msg_size_to_str(int size) {
