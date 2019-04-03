@@ -11,7 +11,7 @@ PATH_TIMESTAMPS_FILE = 'timestamps.txt'
 PATH_TIMESTAMPS_FOLDER = './timestamps/'
 HOST_NAME = 'localhost'
 
-RUNS = 1 # How many times each operation should be run
+RUNS = 3 # How many times each operation should be run
 
 
 
