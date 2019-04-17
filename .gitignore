@@ -14,6 +14,7 @@
 *.jpeg
 !imgs/*.png
 ./timestamps
+!Makefile
 
 # Prerequisites
 *.d
