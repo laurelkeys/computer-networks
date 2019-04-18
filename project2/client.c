@@ -193,10 +193,10 @@ void print_options_list() {
 
     printf("(1) dado o email de um perfil, retornar nome, sobrenome e foto;\n");
     // opt_get_full_name_and_picture_from_profile()
-    printf("(2) listar todas as informações de todos os perfis;\n");
-    // opt_get_profiles()
-    printf("(3) dado o email de um perfil, retornar suas informações;\n");
+    printf("(2) dado o email de um perfil, retornar suas informações;\n");
     // opt_get_profile()
+    printf("(3) listar todas as informações de todos os perfis;\n");
+    // opt_get_profiles()
 
     printf("(%s) sair.\n\n", OPT_QUIT_STR);
 }
