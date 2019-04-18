@@ -323,6 +323,7 @@ void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_desc
 
 void execute_sql(char *sql) {
     char *err_msg = 0;
+    fclose(fopen(FILE_SERVER, "w")); // clears FILE_SERVER to write the latest query's result
     if (sqlite3_exec(db, sql, send_info_callback, 0, &err_msg) != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
@@ -333,7 +334,7 @@ void execute_sql(char *sql) {
 
 int send_info_callback(void *_unused, int length, char **column_content, char **column_name) {
     FILE *f;
-    f = fopen(FILE_SERVER, "w"); // clears FILE_SERVER to write the query's result
+    f = fopen(FILE_SERVER, "a");
     char buffer[512];
     for (int i = 0; i < length; i++) {
         snprintf(buffer, sizeof(buffer), "%s = %s\n", 
