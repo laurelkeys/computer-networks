@@ -1,13 +1,10 @@
 #include "client.h"
 
-int v;
-
 static void _check_args(int argc) {
-    if (argc < 2) {
+    if (argc != 2) {
         fprintf(stderr,"usage: client hostname\n");
         exit(1);
     }
-    v = (argc == 2) ? 0 : 1; // FIXME check for -v with getopt
 }
 
 int main(int argc, char *argv[]) {
@@ -39,23 +36,17 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
         print_options_list();
         read_option(&option);
 
-        option = (option >= 1 && option <= 6) ? option : 7;
+        option = (option >= 1 && option <= 3) ? option : 4;
         printf("\n-- (%d) --\n", option);
         switch (option) {
-            case 1: opt_get_profiles_filtering_education(socket_file_descriptor);
+            case 1: opt_get_full_name_and_picture_from_profile(socket_file_descriptor);
             break;
-            case 2: opt_get_skills_filtering_city(socket_file_descriptor);
+            case 2: opt_get_profile(socket_file_descriptor);
             break;
-            case 3: opt_add_skill_to_profile(socket_file_descriptor);
-            break;
-            case 4: opt_get_experience_from_profile(socket_file_descriptor);
-            break;
-            case 5: opt_get_profiles(socket_file_descriptor);
-            break;
-            case 6: opt_get_profile(socket_file_descriptor);
+            case 3: opt_get_profiles(socket_file_descriptor);
             break;
             default:
-                send_wrapper(socket_file_descriptor, OPT_QUIT_STR, v);
+                send_wrapper(socket_file_descriptor, OPT_QUIT_STR);
                 quit = true;
                 break;
         } // end of option, loops to allow a new one
@@ -76,7 +67,7 @@ void read_option(int *option) {
     char *end;
     char option_buffer[3]; // ['option', '\n', '\0']
     do {
-         if (fgets(option_buffer, sizeof option_buffer, stdin) == NULL) break;
+         if (fgets(option_buffer, sizeof(option_buffer), stdin) == NULL) break;
          option_buffer[strlen(option_buffer) - 1] = '\0'; // remove newline
          *option = strtol(option_buffer, &end, 10);
     } while (end != option_buffer + strlen(option_buffer));
@@ -94,107 +85,15 @@ void save_img(char *file_name, char *buffer, int img_size) {
     FILE *f;
     strcat(file_name, ".png\0");
     f = fopen(file_name, "wb");
-    for (int i = 0; i < img_size; i++) {
+    for (int i = 0; i < img_size; ++i) {
         putc(buffer[i], f);
     }
     fclose(f);
 }
 
-void opt_get_profiles_filtering_education(int socket_file_descriptor) {
-    // (1) listar todas as pessoas formadas em um determinado curso
-    // Read and send input
-    int return_value;
-    char input_buffer[MAX_INPUT_SIZE];
-    return_value = get_input("Digite o curso> ", input_buffer, sizeof(input_buffer));
-    if (validate_input(return_value, "\nCurso não digitado", "Nome muito longo ", input_buffer) != OK)
-        return;
-    
-    log_timestamp("client:opt1:before input send");
-    send_wrapper(socket_file_descriptor, "1", v);
-    send_wrapper(socket_file_descriptor, input_buffer, v);
-
-
-    char *buffer;
-
-    // Print result
-    recv_wrapper(socket_file_descriptor, &buffer, v);
-    log_timestamp("client:opt1:after result receive\n\n");
-    printf("\n%s\n", buffer);
-
-    // Save result
-    char header[256];
-    snprintf(header, sizeof(header), "--> (1) curso: %s\n", input_buffer);
-    save_result_to_file(header, buffer);
-
-    free(buffer);
-}
-
-void opt_get_skills_filtering_city(int socket_file_descriptor) {
-    // (2) listar as habilidades dos perfis que moram em uma determinada cidade
-
-    // Read and send input
-    int return_value;
-    char input_buffer[MAX_INPUT_SIZE];
-    return_value = get_input("Digite a cidade> ", input_buffer, sizeof(input_buffer));
-    if (validate_input(return_value, "\nCidade não digitada", "Nome muito longo ", input_buffer) != OK)
-        return;
-    
-    log_timestamp("client:opt2:before input send");
-    send_wrapper(socket_file_descriptor, "2", v);
-    send_wrapper(socket_file_descriptor, input_buffer, v);
-
-    char *buffer;
-
-    // Print result
-    recv_wrapper(socket_file_descriptor, &buffer, v);
-    log_timestamp("client:opt2:after result receive\n\n");
-    printf("\n%s\n", buffer);
-
-    // Save result
-    char header[256];
-    snprintf(header, sizeof(header), "--> (2) cidade: %s\n", input_buffer);
-    save_result_to_file(header, buffer);
-    free(buffer);
-}
-
-void opt_add_skill_to_profile(int socket_file_descriptor) {
-    // (3) acrescentar uma nova experiência em um perfil
-
-    // Read and send input
-    int return_value;
-    char input_buffer_email[MAX_INPUT_SIZE];
-    return_value = get_input("Digite o email do perfil> ", input_buffer_email, sizeof(input_buffer_email));
-    if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer_email) != OK)
-        return;
-    
-    // TODO verify if the profile exists before asking for the skill
-    char input_buffer_skill[MAX_INPUT_SIZE];
-    return_value = get_input("Digite a habilidade> ", input_buffer_skill, sizeof(input_buffer_skill));
-    if (validate_input(return_value, "\nHabilidade não digitada", "Nome muito longo ", input_buffer_skill) != OK)
-        return;
-
-    log_timestamp("client:opt3:before input send");
-    send_wrapper(socket_file_descriptor, "3", v);
-    send_wrapper(socket_file_descriptor, input_buffer_email, v);
-    send_wrapper(socket_file_descriptor, input_buffer_skill, v);
-
-
-    char *buffer;
-
-    // Print result
-    recv_wrapper(socket_file_descriptor, &buffer, v);
-    log_timestamp("client:opt3:after result receive\n\n");
-    printf("\n%s\n", buffer);
-
-    // Save result
-    char header[256];
-    snprintf(header, sizeof(header), "--> (3) email: %s, habilidade: %s\n", input_buffer_email, input_buffer_skill);
-    save_result_to_file(header, buffer);
-    free(buffer);
-}
-
-void opt_get_experience_from_profile(int socket_file_descriptor) {
-    // (4) dado o email do perfil, retornar sua experiência
+void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
+    // (1) dado o email de um perfil, retornar nome, sobrenome e foto
+    send_wrapper(socket_file_descriptor, "1");
 
     // Read and send input
     int return_value;
@@ -202,112 +101,101 @@ void opt_get_experience_from_profile(int socket_file_descriptor) {
     return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
-    
-    log_timestamp("client:opt4:before input send");
-    send_wrapper(socket_file_descriptor, "4", v);
-    send_wrapper(socket_file_descriptor, input_buffer, v);
+    send_wrapper(socket_file_descriptor, input_buffer);
 
     char *buffer;
 
     // Print result
-    recv_wrapper(socket_file_descriptor, &buffer, v);
-    log_timestamp("client:opt4:after result receive\n\n");
+    recv_wrapper(socket_file_descriptor, &buffer);
     printf("\n%s\n", buffer);
 
     // Save result
     char header[256];
-    snprintf(header, sizeof(header), "--> (4) email: %s\n", input_buffer);
-    save_result_to_file(header, buffer);
-    free(buffer);
-}
-
-void opt_get_profiles(int socket_file_descriptor) {
-    // (5) listar todas as informações de todos os perfis
-    log_timestamp("client:opt5:before input send");
-    send_wrapper(socket_file_descriptor, "5", v);
-
-    char *buffer;
-
-    // Print result
-    recv_wrapper(socket_file_descriptor, &buffer, v);
-    printf("\n%s\n", buffer); // prints the received result
-
-    // Save result
-    save_result_to_file("--> (5)\n", buffer);
-    free(buffer);
-
-    // save pictures
-    char *name;
-    int img_size;
-    recv_wrapper(socket_file_descriptor, &name, v);
-    // printf("All profiles name - ''%s''\n", name);
-    while (strcmp(name,"THATS ALL;\0")) {
-        // Save picture
-        recv_img_wrapper(socket_file_descriptor, &buffer, &img_size, v);
-        save_img(name, buffer, img_size);
-        free(buffer);
-
-        printf("Picture downloaded: %s\n", name);
-
-        // Get next name or finish message
-        free(name);
-        recv_wrapper(socket_file_descriptor, &name, v);
-        // printf("All profiles name - ''%s''\n", name);
-    }
-    log_timestamp("client:opt5:after result receive\n\n");
-    printf("\n");
-    free(name);
-}
-
-void opt_get_profile(int socket_file_descriptor) {
-    // (6) dado o email de um perfil, retornar suas informações
-    send_wrapper(socket_file_descriptor, "6", v);
-
-    // Read and send input
-    int return_value;
-    char input_buffer[MAX_INPUT_SIZE];
-    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
-    if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
-        return;
-    log_timestamp("client:opt6:before input send");
-    send_wrapper(socket_file_descriptor, input_buffer, v);
-
-
-    char *buffer;
-
-    // Print result
-    recv_wrapper(socket_file_descriptor, &buffer, v);
-    printf("\n%s\n", buffer);
-
-    // Save result
-    char header[256];
-    snprintf(header, sizeof(header), "--> (6) email: %s\n", input_buffer);
+    snprintf(header, sizeof(header), "--> (1) email: %s\n", input_buffer);
     save_result_to_file(header, buffer);
     free(buffer);
 
     // Save picture
     int img_size;
-    recv_img_wrapper(socket_file_descriptor, &buffer, &img_size, v);
-    log_timestamp("client:opt6:after result receive\n\n");
+    recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
     save_img(input_buffer, buffer, img_size);
     printf("Picture downloaded: %s\n", input_buffer);
     free(buffer);
 }
 
+void opt_get_profile(int socket_file_descriptor) {
+    // (2) dado o email de um perfil, retornar suas informações
+    send_wrapper(socket_file_descriptor, "2");
+
+    // Read and send input
+    int return_value;
+    char input_buffer[MAX_INPUT_SIZE];
+    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
+    if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
+        return;
+    send_wrapper(socket_file_descriptor, input_buffer);
+
+    char *buffer;
+
+    // Print result
+    recv_wrapper(socket_file_descriptor, &buffer);
+    printf("\n%s\n", buffer);
+
+    // Save result
+    char header[256];
+    snprintf(header, sizeof(header), "--> (2) email: %s\n", input_buffer);
+    save_result_to_file(header, buffer);
+    free(buffer);
+
+    // Save picture
+    int img_size;
+    recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
+    save_img(input_buffer, buffer, img_size);
+    printf("Picture downloaded: %s\n", input_buffer);
+    free(buffer);
+}
+
+void opt_get_profiles(int socket_file_descriptor) {
+    // (3) listar todas as informações de todos os perfis
+    send_wrapper(socket_file_descriptor, "3");
+
+    char *buffer;
+
+    // Print result
+    recv_wrapper(socket_file_descriptor, &buffer);
+    printf("\n%s\n", buffer);
+
+    // Save result
+    save_result_to_file("--> (3)\n", buffer);
+    free(buffer);
+
+    // Save pictures
+    char *name;
+    int img_size;
+    recv_wrapper(socket_file_descriptor, &name);
+    while (strcmp(name, "THATS ALL;\0")) {
+        // Save picture
+        recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
+        save_img(name, buffer, img_size);
+        printf("Picture downloaded: %s\n", name);
+        free(buffer);
+        free(name);
+
+        // Get the next name or finish message ("THATS ALL;\0")
+        recv_wrapper(socket_file_descriptor, &name);
+    }
+    printf("\n");
+    free(name);
+}
+
 void print_options_list() {
     printf("Escolha uma das seguintes opções:\n");
 
-    printf("(1) listar todas as pessoas formadas em um determinado curso;\n");
-    // opt_get_profiles_filtering_education()
-    printf("(2) listar as habilidades dos perfis que moram em uma determinada cidade;\n");
-    // opt_get_skills_filtering_city()
-    printf("(3) acrescentar uma nova experiência em um perfil;\n");
-    // opt_add_skill_to_profile()
-    printf("(4) dado o email do perfil, retornar sua experiência;\n");
-    // opt_get_experience_from_profile()
-    printf("(5) listar todas as informações de todos os perfis;\n");
+    printf("(1) dado o email de um perfil, retornar nome, sobrenome e foto;\n");
+    // opt_get_full_name_and_picture_from_profile()
+    printf("(2) listar todas as informações de todos os perfis;\n");
     // opt_get_profiles()
-    printf("(6) dado o email de um perfil, retornar suas informações;\n");
+    printf("(3) dado o email de um perfil, retornar suas informações;\n");
     // opt_get_profile()
 
     printf("(%s) sair.\n\n", OPT_QUIT_STR);
@@ -341,7 +229,9 @@ void connect_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_d
             perror("client: connect");
             close(*socket_file_descriptor);
             continue;
-        } else connection_refused = 0;
+        } else {
+            connection_refused = 0;
+        }
 
         break;
     }

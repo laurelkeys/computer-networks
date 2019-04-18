@@ -28,7 +28,7 @@
 #define SOCKET_IPV4 PF_INET
 #define SOCKET_IPV6 PF_INET6
 
-#define OPT_QUIT_STR "7"
+#define OPT_QUIT_STR "4"
 
 #define FILE_CLIENT "option_results.txt"
 #define FILE_SERVER "last_query_result.txt"
