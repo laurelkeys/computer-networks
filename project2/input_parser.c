@@ -3,20 +3,20 @@
 int validate_input(int code, char *no_input_msg, char *too_long_msg, char *input_buffer) {
     if (code == NO_INPUT) {
         printf ("%s\n", no_input_msg);
-        return !OK;
+        return NOT_OK;
     }
 
     if (code == TOO_LONG) {
         printf ("%s [%s]\n", too_long_msg, input_buffer);
-        return !OK;
+        return NOT_OK;
     }
 
     return OK;
 }
 
-int get_input(char *input, char *input_buffer, size_t max_size) {
-    if (input != NULL) {
-        printf("%s", input);
+int get_input(char *input_msg, char *input_buffer, size_t max_size) {
+    if (input_msg != NULL) {
+        printf("%s", input_msg);
         fflush(stdout);
     }
 

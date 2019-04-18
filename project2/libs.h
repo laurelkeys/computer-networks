@@ -15,7 +15,7 @@
 #include "common.h"
 
 #ifndef PORT
-#define PORT "3490"  // the port users will be connecting to
+#define PORT "3490" // the port clients will connect to
 #endif
 
 #define UDP SOCK_DGRAM
@@ -33,7 +33,5 @@
 #define FILE_CLIENT "option_results.txt"
 #define FILE_SERVER "last_query_result.txt"
 #define FILE_TIMESTAMPS "timestamps.txt"
-
-typedef enum { false, true } bool;
 
 #endif

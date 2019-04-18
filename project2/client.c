@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
 void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor) {
     int option;
-    bool quit = false;
+    int quit = 0;
     while (!quit) {
         print_options_list();
         read_option(&option);
@@ -47,7 +47,7 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
             break;
             default:
                 send_wrapper(socket_file_descriptor, OPT_QUIT_STR);
-                quit = true;
+                quit = 1;
                 break;
         } // end of option, loops to allow a new one
     }
@@ -119,7 +119,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     int img_size;
     recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
     save_img(input_buffer, buffer, img_size);
-    printf("Picture downloaded: %s\n", input_buffer);
+    printf("Picture downloaded: %s\n", input_buffer); // TODO change to PTBR
     free(buffer);
 }
 
@@ -151,7 +151,7 @@ void opt_get_profile(int socket_file_descriptor) {
     int img_size;
     recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
     save_img(input_buffer, buffer, img_size);
-    printf("Picture downloaded: %s\n", input_buffer);
+    printf("Picture downloaded: %s\n", input_buffer); // TODO change to PTBR
     free(buffer);
 }
 
@@ -177,7 +177,7 @@ void opt_get_profiles(int socket_file_descriptor) {
         // Save picture
         recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
         save_img(name, buffer, img_size);
-        printf("Picture downloaded: %s\n", name);
+        printf("Picture downloaded: %s\n", name); // TODO change to PTBR
         free(buffer);
         free(name);
 
