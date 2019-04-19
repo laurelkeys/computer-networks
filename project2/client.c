@@ -94,12 +94,12 @@ void save_img(char *file_name, char *buffer, int img_size) {
 
 void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     // (1) dado o email de um perfil, retornar nome, sobrenome e foto
-    sendto_wrapper(socket_file_descriptor, "1", connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
 
     // Read and send input
     int return_value;
-    char input_buffer[MAX_INPUT_SIZE];
-    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
+    char input_buffer[MAX_INPUT_SIZE+1];
+    input_buffer[0] = '1';
+    return_value = get_input("Digite o email do perfil> ", input_buffer+1, sizeof(input_buffer));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
     sendto_wrapper(socket_file_descriptor, input_buffer, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen); // FIXME send all information at once

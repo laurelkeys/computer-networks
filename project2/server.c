@@ -46,16 +46,16 @@ void receive_message(int socket_file_descriptor) {
     printf("server: received from client: '%s'\n", buffer);
     
     opt = buffer[0];
-    free(buffer);
 
     switch (opt - '0') {
-        case 1: opt_get_full_name_and_picture_from_profile(socket_file_descriptor);
+        case 1: opt_get_full_name_and_picture_from_profile(socket_file_descriptor, buffer+1);
         break;
-        case 2: opt_get_profile(socket_file_descriptor);
+        case 2: opt_get_profile(socket_file_descriptor, buffer+1);
         break;
         case 3: opt_get_profiles(socket_file_descriptor);
         break;
     }
+    free(buffer);
 }
 
 void sendto_file_to_client(int socket_file_descriptor, FILE *f) {
@@ -98,13 +98,9 @@ void sendto_img_to_client(int socket_file_descriptor, FILE *f) {
 
 // OPTIONS //////////////////////////////
 
-void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
+void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor, char *email) {
     // (1) dado o email de um perfil, retornar nome, sobrenome e foto
     printf("server: client selected option 1:\n");
-
-    char *email;
-    addr_len = sizeof(their_addr);
-    recvfrom_wrapper(socket_file_descriptor, &email, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once (before)
     printf("server: email '%s'\n", email);
 
     /*log_timestamp("server:opt1:before query");*/
@@ -129,17 +125,11 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
         sendto_img_to_client(socket_file_descriptor, NULL);
     }
-
-    free(email);
 }
 
-void opt_get_profile(int socket_file_descriptor) {
+void opt_get_profile(int socket_file_descriptor, char *email) {
     // (2) dado o email de um perfil, retornar suas informações
     printf("server: client selected option 2:\n");
-
-    char *email;
-    addr_len = sizeof(their_addr);
-    recvfrom_wrapper(socket_file_descriptor, &email, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once (before)
     printf("server: email '%s'\n", email);
 
     /*log_timestamp("server:opt2:before query");*/
@@ -164,8 +154,6 @@ void opt_get_profile(int socket_file_descriptor) {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
         sendto_img_to_client(socket_file_descriptor, NULL);
     }
-
-    free(email);
 }
 
 void opt_get_profiles(int socket_file_descriptor) {

@@ -22,9 +22,9 @@ void get_server_addrinfo(const char *hostname, const char *port, struct addrinfo
 void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_descriptor, struct addrinfo **p);
 
 // OPTIONS //////////////////////////////
-void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor); // (1)
-void opt_get_profile(int socket_file_descriptor);                            // (2)
-void opt_get_profiles(int socket_file_descriptor);                           // (3)
+void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor, char *email); // (1)
+void opt_get_profile(int socket_file_descriptor, char *email);                            // (2)
+void opt_get_profiles(int socket_file_descriptor);                                        // (3)
 
 // DATABASE /////////////////////////////
 void init_db();
