@@ -115,6 +115,8 @@ int recvfrom_wrapper(int file_descriptor, char **buffer, struct sockaddr *src_ad
 
 // TODO set a timeout if no message is received
 int recvfrom_img_wrapper(int file_descriptor, char **buffer, int *size, struct sockaddr *src_addr, socklen_t *addrlen) {
+    *size = 0;
+    *buffer = malloc(sizeof(char*));
     return 1; //FIXME send imgs
     char header_buffer[HEADER_SIZE];
     int bytes_received = 0;

@@ -5,6 +5,7 @@ sqlite3_stmt *res;
 
 struct addrinfo *connected_addrinfo;
 struct sockaddr_storage their_addr; // connector's address information
+socklen_t addr_len;
 
 int main(void) {
     // initializes the db with data
@@ -40,7 +41,7 @@ void receive_message(int socket_file_descriptor) {
     char opt;
     char *buffer;
     // Read client message
-    socklen_t addr_len = sizeof(their_addr);
+    addr_len = sizeof(their_addr);
     recvfrom_wrapper(socket_file_descriptor, &buffer, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once
     printf("server: received from client: '%s'\n", buffer);
     
@@ -62,8 +63,9 @@ void sendto_file_to_client(int socket_file_descriptor, FILE *f) {
     long file_size = ftell(f);
     fseek(f, 0, SEEK_SET);
 
+    
     if (file_size == 0) {
-        sendto_wrapper(socket_file_descriptor, "Nenhum resultado encontrado no banco de dados", connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
+        sendto_wrapper(socket_file_descriptor, "Nenhum resultado encontrado no banco de dados", (const struct sockaddr *)&their_addr, addr_len);
     } else {
         char text[file_size + 1];
         text[0] = '\0';
@@ -72,7 +74,7 @@ void sendto_file_to_client(int socket_file_descriptor, FILE *f) {
         while (fgets(buffer,file_size,f)) strcat(text,buffer);
         text[file_size] = '\0';
 
-        sendto_wrapper(socket_file_descriptor, text, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
+        sendto_wrapper(socket_file_descriptor, text, (const struct sockaddr *)&their_addr, addr_len);
     }
 }
 
@@ -101,7 +103,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     printf("server: client selected option 1:\n");
 
     char *email;
-    socklen_t addr_len = sizeof(their_addr);
+    addr_len = sizeof(their_addr);
     recvfrom_wrapper(socket_file_descriptor, &email, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once (before)
     printf("server: email '%s'\n", email);
 
@@ -136,7 +138,7 @@ void opt_get_profile(int socket_file_descriptor) {
     printf("server: client selected option 2:\n");
 
     char *email;
-    socklen_t addr_len = sizeof(their_addr);
+    addr_len = sizeof(their_addr);
     recvfrom_wrapper(socket_file_descriptor, &email, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once (before)
     printf("server: email '%s'\n", email);
 
