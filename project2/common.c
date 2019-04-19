@@ -27,7 +27,7 @@ int sendto_wrapper(int file_descriptor, char *message, const struct sockaddr *de
 int sendto_img_wrapper(int file_descriptor, char *message, int msg_size, const struct sockaddr *dest_addr, socklen_t addrlen) {
     // Send picture
     int n;
-    n = sendto(file_descriptor, message, msg_size, 0, dest_addr, addrlen);
+    n = sendto(file_descriptor, message ? message : "", msg_size, 0, dest_addr, addrlen);
     if (n == -1) {
         perror("sendto_img_wrapper: common: send");
         return 1;

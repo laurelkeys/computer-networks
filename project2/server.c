@@ -92,7 +92,7 @@ void sendto_img_to_client(int socket_file_descriptor, FILE *f) {
 
         sendto_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer), (const struct sockaddr *)&their_addr, addr_len);
     } else {
-        sendto_wrapper(socket_file_descriptor, "Foto não encontrada", (const struct sockaddr *)&their_addr, addr_len);
+        sendto_img_wrapper(socket_file_descriptor, NULL, 0, (const struct sockaddr *)&their_addr, addr_len);
     }
 }
 
