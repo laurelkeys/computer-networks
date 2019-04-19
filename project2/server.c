@@ -95,7 +95,7 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_SET);
 
     if (file_size == 0) {
-        send_wrapper(socket_file_descriptor, "No results"); // TODO change to PTBR
+        send_wrapper(socket_file_descriptor, "Nenhum resultado encontrado no banco de dados");
     } else {
         char text[file_size + 1];
         text[0] = '\0';
@@ -109,17 +109,21 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
 }
 
 void send_img_to_client(int socket_file_descriptor, FILE *f) {
-    fseek(f, 0, SEEK_END);
-    long file_size = ftell(f);
-    fseek(f, 0, SEEK_SET);
+    if (f != NULL) {
+        fseek(f, 0, SEEK_END);
+        long file_size = ftell(f);
+        fseek(f, 0, SEEK_SET);
 
-    int i;
-    char img_buffer[file_size + 1];
-    for (i = 0; i < sizeof(img_buffer); i++) {
-        fread(img_buffer + i, 1, 1, f);
+        int i;
+        char img_buffer[file_size + 1];
+        for (i = 0; i < sizeof(img_buffer); i++) {
+            fread(img_buffer + i, 1, 1, f);
+        }
+
+        send_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer));
+    } else {
+        send_img_wrapper(socket_file_descriptor, NULL, 0);
     }
-
-    send_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer));
 }
 
 // OPTIONS //////////////////////////////
@@ -152,7 +156,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
         fclose(img_file);
     } else {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
-        // FIXME notify the client that's expecting the picture with recv_img_wrapper()
+        send_img_to_client(socket_file_descriptor, NULL);
     }
 
     free(email);
@@ -186,7 +190,7 @@ void opt_get_profile(int socket_file_descriptor) {
         fclose(img_file);
     } else {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
-        // FIXME notify the client that's expecting the picture with recv_img_wrapper()
+        send_img_to_client(socket_file_descriptor, NULL);
     }
 
     free(email);
@@ -237,14 +241,14 @@ void opt_get_profiles(int socket_file_descriptor) {
         f = fopen((email+1),"rb");
         printf("server: uploading picture to client: %s\n", (email+1));
         email[end-begin] = '\0';
+        send_wrapper(socket_file_descriptor, (email+8));
         if (f) {
-            send_wrapper(socket_file_descriptor, (email+8));
             send_img_to_client(socket_file_descriptor, f);
             fclose(f);
             printf("server: picture sent\n");
         } else {
             printf("server: img_file not found (path: '%s')\n", (email+1));
-            // FIXME notify the client that's expecting the picture with recv_img_wrapper()
+            send_img_to_client(socket_file_descriptor, NULL);
         }
         free(email);
         end += 2;

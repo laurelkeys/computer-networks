@@ -118,8 +118,12 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     // Save picture
     int img_size;
     recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
-    save_img(input_buffer, buffer, img_size);
-    printf("Picture downloaded: %s\n", input_buffer); // TODO change to PTBR
+    if (img_size > 0) {
+        save_img(input_buffer, buffer, img_size);
+        printf("Foto de perfil salva: %s\n\n", input_buffer);
+    } else {
+        printf("Nenhuma foto foi encontrada (%s)\n\n", input_buffer);
+    }
     free(buffer);
 }
 
@@ -150,8 +154,12 @@ void opt_get_profile(int socket_file_descriptor) {
     // Save picture
     int img_size;
     recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
-    save_img(input_buffer, buffer, img_size);
-    printf("Picture downloaded: %s\n", input_buffer); // TODO change to PTBR
+    if (img_size > 0) {
+        save_img(input_buffer, buffer, img_size);
+        printf("Foto de perfil salva: %s\n\n", input_buffer);
+    } else {
+        printf("Nenhuma foto foi encontrada (%s)\n\n", input_buffer);
+    }
     free(buffer);
 }
 
@@ -176,8 +184,12 @@ void opt_get_profiles(int socket_file_descriptor) {
     while (strcmp(name, "THATS ALL;\0")) {
         // Save picture
         recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
-        save_img(name, buffer, img_size);
-        printf("Picture downloaded: %s\n", name); // TODO change to PTBR
+        if (img_size > 0) {
+            save_img(name, buffer, img_size);
+            printf("Foto de perfil salva: %s\n\n", name);
+        } else {
+            printf("Nenhuma foto foi encontrada (%s)\n\n", name);
+        }
         free(buffer);
         free(name);
 
