@@ -112,7 +112,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
 
     // Save result
     char header[256];
-    snprintf(header, sizeof(header), "--> (1) email: %s\n", input_buffer);
+    snprintf(header, sizeof(header), "--> (1) email: %s\n", input_buffer+1);
     save_result_to_file(header, buffer);
     free(buffer);
 
@@ -130,12 +130,12 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
 
 void opt_get_profile(int socket_file_descriptor) {
     // (2) dado o email de um perfil, retornar suas informações
-    sendto_wrapper(socket_file_descriptor, "2", connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
 
     // Read and send input
     int return_value;
-    char input_buffer[MAX_INPUT_SIZE];
-    return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
+    char input_buffer[MAX_INPUT_SIZE+1];
+    input_buffer[0] = '2';
+    return_value = get_input("Digite o email do perfil> ", input_buffer+1, sizeof(input_buffer));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
     sendto_wrapper(socket_file_descriptor, input_buffer, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen); // FIXME send all information at once
@@ -148,7 +148,7 @@ void opt_get_profile(int socket_file_descriptor) {
 
     // Save result
     char header[256];
-    snprintf(header, sizeof(header), "--> (2) email: %s\n", input_buffer);
+    snprintf(header, sizeof(header), "--> (2) email: %s\n", input_buffer+1);
     save_result_to_file(header, buffer);
     free(buffer);
 

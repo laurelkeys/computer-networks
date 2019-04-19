@@ -65,7 +65,7 @@ void sendto_file_to_client(int socket_file_descriptor, FILE *f) {
 
     
     if (file_size == 0) {
-        sendto_wrapper(socket_file_descriptor, "Nenhum resultado encontrado no banco de dados", (const struct sockaddr *)&their_addr, addr_len);
+        sendto_wrapper(socket_file_descriptor, "Nenhum resultado encontrado no banco de dados\n", (const struct sockaddr *)&their_addr, addr_len);
     } else {
         char text[file_size + 1];
         text[0] = '\0';
