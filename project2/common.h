@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include "libs.h"
 
+#define MAX_MSG_SIZE 64000
 #define HEADER_SIZE 12 + 1 // + 1 to add '\0'
 
 void log_timestamp(char *label);
