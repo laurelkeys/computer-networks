@@ -10,10 +10,10 @@
 
 #define BACKLOG 10 // how many pending connections the queue will hold
 
-void receive_messages(int socket_file_descriptor);
+void receive_message(int socket_file_descriptor);
 
-void send_file_to_client(int socket_file_descriptor, FILE *f);
-void send_img_to_client(int socket_file_descriptor, FILE *f);
+void sendto_file_to_client(int socket_file_descriptor, FILE *f);
+void sendto_img_to_client(int socket_file_descriptor, FILE *f);
 
 // CONNECTION ///////////////////////////
 void sigchld_handler(int s);

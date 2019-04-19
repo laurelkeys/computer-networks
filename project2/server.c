@@ -3,6 +3,9 @@
 sqlite3 *db;
 sqlite3_stmt *res;
 
+struct addrinfo *connected_addrinfo;
+struct sockaddr_storage their_addr; // connector's address information
+
 int main(void) {
     // initializes the db with data
     init_db();
@@ -14,88 +17,53 @@ int main(void) {
 
     // associates the socket referred to by socket_file_descriptor with the local address
     int socket_file_descriptor;
-    struct addrinfo *connected_addrinfo;
     bind_to_first_match(server_addrinfo, &socket_file_descriptor, &connected_addrinfo);
     freeaddrinfo(server_addrinfo);
 
-    // listens for connections on the socket referred to by socket_file_descriptor
-    if (listen(socket_file_descriptor, BACKLOG) == -1) {
-        perror("listen");
-        exit(1);
-    }
-
-    // reaps all dead processes
-    struct sigaction sa;
-    sa.sa_handler = sigchld_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(1);
-    }
-
     // main accept() loop
-    printf("server: waiting for connections...\n");
+    printf("server: waiting to recvfrom...\n");
 
-    socklen_t sin_size;
     char s[INET6_ADDRSTRLEN];
-    struct sockaddr_storage their_addr; // connector's address information
-    int new_file_descriptor; // associated with new client connections
     
     while (1) {
-        sin_size = sizeof(their_addr);
-        new_file_descriptor = accept(socket_file_descriptor, (struct sockaddr *)&their_addr, &sin_size);
-        if (new_file_descriptor == -1) {
-            perror("accept");
-            continue;
-        }
+        receive_message(socket_file_descriptor);
 
         inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr), s, sizeof(s));
-        printf("server: got connection from %s\n", s);
-
-        if (!fork()) { // this is the child process
-            close(socket_file_descriptor); // child doesn't need the listener
-            receive_messages(new_file_descriptor); // loops untill the client decides to quit
-            close(new_file_descriptor);
-            exit(0);
-        }
-
-        close(new_file_descriptor); // parent doesn't need this
+        printf("server: got packet from %s\n", s);
     }
 
+    close(socket_file_descriptor);
     exit(0);
 }
 
-void receive_messages(int socket_file_descriptor) {
+void receive_message(int socket_file_descriptor) {
     char opt;
     char *buffer;
-    while (1) {
-        // Read client message
-        recv_wrapper(socket_file_descriptor, &buffer);
-        printf("server: received from client: '%s'\n", buffer);
-        
-        opt = buffer[0];
-        free(buffer);
-        if (opt == OPT_QUIT_STR[0]) break;
+    // Read client message
+    socklen_t addr_len = sizeof(their_addr);
+    recvfrom_wrapper(socket_file_descriptor, &buffer, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once
+    printf("server: received from client: '%s'\n", buffer);
+    
+    opt = buffer[0];
+    free(buffer);
 
-        switch (opt - '0') {
-            case 1: opt_get_full_name_and_picture_from_profile(socket_file_descriptor);
-            break;
-            case 2: opt_get_profile(socket_file_descriptor);
-            break;
-            case 3: opt_get_profiles(socket_file_descriptor);
-            break;
-        }
+    switch (opt - '0') {
+        case 1: opt_get_full_name_and_picture_from_profile(socket_file_descriptor);
+        break;
+        case 2: opt_get_profile(socket_file_descriptor);
+        break;
+        case 3: opt_get_profiles(socket_file_descriptor);
+        break;
     }
 }
 
-void send_file_to_client(int socket_file_descriptor, FILE *f) {
+void sendto_file_to_client(int socket_file_descriptor, FILE *f) {
     fseek(f, 0, SEEK_END);
     long file_size = ftell(f);
     fseek(f, 0, SEEK_SET);
 
     if (file_size == 0) {
-        send_wrapper(socket_file_descriptor, "Nenhum resultado encontrado no banco de dados");
+        sendto_wrapper(socket_file_descriptor, "Nenhum resultado encontrado no banco de dados", connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
     } else {
         char text[file_size + 1];
         text[0] = '\0';
@@ -104,11 +72,11 @@ void send_file_to_client(int socket_file_descriptor, FILE *f) {
         while (fgets(buffer,file_size,f)) strcat(text,buffer);
         text[file_size] = '\0';
 
-        send_wrapper(socket_file_descriptor, text);
+        sendto_wrapper(socket_file_descriptor, text, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
     }
 }
 
-void send_img_to_client(int socket_file_descriptor, FILE *f) {
+void sendto_img_to_client(int socket_file_descriptor, FILE *f) {
     if (f != NULL) {
         fseek(f, 0, SEEK_END);
         long file_size = ftell(f);
@@ -120,9 +88,9 @@ void send_img_to_client(int socket_file_descriptor, FILE *f) {
             fread(img_buffer + i, 1, 1, f);
         }
 
-        send_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer));
+        sendto_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer), connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
     } else {
-        send_img_wrapper(socket_file_descriptor, NULL, 0);
+        sendto_img_wrapper(socket_file_descriptor, NULL, 0, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
     }
 }
 
@@ -133,7 +101,8 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     printf("server: client selected option 1:\n");
 
     char *email;
-    recv_wrapper(socket_file_descriptor, &email);
+    socklen_t addr_len = sizeof(their_addr);
+    recvfrom_wrapper(socket_file_descriptor, &email, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once (before)
     printf("server: email '%s'\n", email);
 
     /*log_timestamp("server:opt1:before query");*/
@@ -143,7 +112,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     // Send name and surname
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
-        send_file_to_client(socket_file_descriptor, f);
+        sendto_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
 
@@ -152,11 +121,11 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     sprintf(img_file_path, "./imgs/%s.png", email);
     FILE *img_file = fopen(img_file_path, "rb");
     if (img_file) {
-        send_img_to_client(socket_file_descriptor, img_file);
+        sendto_img_to_client(socket_file_descriptor, img_file);
         fclose(img_file);
     } else {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
-        send_img_to_client(socket_file_descriptor, NULL);
+        sendto_img_to_client(socket_file_descriptor, NULL);
     }
 
     free(email);
@@ -167,7 +136,8 @@ void opt_get_profile(int socket_file_descriptor) {
     printf("server: client selected option 2:\n");
 
     char *email;
-    recv_wrapper(socket_file_descriptor, &email);
+    socklen_t addr_len = sizeof(their_addr);
+    recvfrom_wrapper(socket_file_descriptor, &email, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once (before)
     printf("server: email '%s'\n", email);
 
     /*log_timestamp("server:opt2:before query");*/
@@ -177,7 +147,7 @@ void opt_get_profile(int socket_file_descriptor) {
     // Send profile info
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
-        send_file_to_client(socket_file_descriptor, f);
+        sendto_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
 
@@ -186,11 +156,11 @@ void opt_get_profile(int socket_file_descriptor) {
     sprintf(img_file_path, "./imgs/%s.png", email);
     FILE *img_file = fopen(img_file_path, "rb");
     if (img_file) {
-        send_img_to_client(socket_file_descriptor, img_file);
+        sendto_img_to_client(socket_file_descriptor, img_file);
         fclose(img_file);
     } else {
         printf("server: img_file not found (path: '%s')\n", img_file_path);
-        send_img_to_client(socket_file_descriptor, NULL);
+        sendto_img_to_client(socket_file_descriptor, NULL);
     }
 
     free(email);
@@ -207,7 +177,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     // Send profiles info
     FILE *f = fopen(FILE_SERVER, "r");
     if (f) {
-        send_file_to_client(socket_file_descriptor, f);
+        sendto_file_to_client(socket_file_descriptor, f);
         fclose(f);
     }
 
@@ -241,14 +211,14 @@ void opt_get_profiles(int socket_file_descriptor) {
         f = fopen((email+1),"rb");
         printf("server: uploading picture to client: %s\n", (email+1));
         email[end-begin] = '\0';
-        send_wrapper(socket_file_descriptor, (email+8));
+        sendto_wrapper(socket_file_descriptor, (email+8), connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
         if (f) {
-            send_img_to_client(socket_file_descriptor, f);
+            sendto_img_to_client(socket_file_descriptor, f);
             fclose(f);
             printf("server: picture sent\n");
         } else {
             printf("server: img_file not found (path: '%s')\n", (email+1));
-            send_img_to_client(socket_file_descriptor, NULL);
+            sendto_img_to_client(socket_file_descriptor, NULL);
         }
         free(email);
         end += 2;
@@ -256,7 +226,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     }
 
     free(emails);
-    send_wrapper(socket_file_descriptor, "THATS ALL;");
+    sendto_wrapper(socket_file_descriptor, "THATS ALL;", connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
 }
 
 // CONNECTION ///////////////////////////
@@ -284,7 +254,7 @@ void get_server_addrinfo(const char *hostname, const char *port, struct addrinfo
     struct addrinfo hints;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = STRUCT_IPVX;
-    hints.ai_socktype = TCP;
+    hints.ai_socktype = UDP;
     hints.ai_flags = AI_PASSIVE; // use my IP
 
     int return_value;
@@ -303,10 +273,11 @@ void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_desc
             continue;
         }
 
+        /*
         if (setsockopt(*socket_file_descriptor, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
             perror("setsockopt");
             exit(1);
-        }
+        }*/
 
         if (bind(*socket_file_descriptor, (*p)->ai_addr, (*p)->ai_addrlen) == -1) {
             close(*socket_file_descriptor);

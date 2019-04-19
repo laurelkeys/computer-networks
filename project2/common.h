@@ -8,10 +8,10 @@
 
 void log_timestamp(char *label);
 
-int send_wrapper(int file_descriptor, char *message);
-int recv_wrapper(int file_descriptor, char **buffer);
+int sendto_wrapper(int file_descriptor, char *message, const struct sockaddr *dest_addr, socklen_t addrlen);
+int recvfrom_wrapper(int file_descriptor, char **buffer, struct sockaddr *src_addr, socklen_t *addrlen);
 
-int send_img_wrapper(int file_descriptor, char * message, int msg_size);
-int recv_img_wrapper(int file_descriptor, char **buffer, int *size);
+int sendto_img_wrapper(int file_descriptor, char * message, int msg_size, const struct sockaddr *dest_addr, socklen_t addrlen);
+int recvfrom_img_wrapper(int file_descriptor, char **buffer, int *size, struct sockaddr *src_addr, socklen_t *addrlen);
 
 #endif

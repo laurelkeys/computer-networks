@@ -30,7 +30,7 @@ static char* _msg_size_to_str(int size) {
     return result;
 }
 
-int send_wrapper(int file_descriptor, char *message) {
+int sendto_wrapper(int file_descriptor, char *message, const struct sockaddr *dest_addr, socklen_t addrlen) {
     int msg_size = strlen(message);
     char *header = _msg_size_to_str(msg_size);
     msg_size += HEADER_SIZE - 1;
@@ -43,12 +43,12 @@ int send_wrapper(int file_descriptor, char *message) {
     int bytes_left = msg_size; // how many we have left to send
     int n;
     while (bytes_sent < msg_size) {
-        n = send(file_descriptor, buffer + bytes_sent, bytes_left, 0);
+        n = sendto(file_descriptor, buffer + bytes_sent, bytes_left, 0, dest_addr, addrlen);
         if (n == -1) {
-            perror("send_wrapper: common: send");
+            perror("sendto_wrapper: common: send");
             break;
         } else if (n <= 0) {
-            perror("send_wrapper: common: n <= 0");
+            perror("sendto_wrapper: common: n <= 0");
             break;
         }
 
@@ -59,7 +59,7 @@ int send_wrapper(int file_descriptor, char *message) {
     return bytes_left; // return # of unsent bytes
 }
 
-int send_img_wrapper(int file_descriptor, char *message, int msg_size) {
+int sendto_img_wrapper(int file_descriptor, char *message, int msg_size, const struct sockaddr *dest_addr, socklen_t addrlen) {
     char *header = _msg_size_to_str(msg_size);
 
     int n;
@@ -68,12 +68,12 @@ int send_img_wrapper(int file_descriptor, char *message, int msg_size) {
     int bytes_sent = 0; // how many bytes we've sent
     int bytes_left = HEADER_SIZE - 1; // how many we have left to send
     while (bytes_sent < HEADER_SIZE - 1) {
-        n = send(file_descriptor, header + bytes_sent, bytes_left, 0);
+        n = sendto(file_descriptor, header + bytes_sent, bytes_left, 0, dest_addr, addrlen);
         if (n == -1) {
-            perror("send_img_wrapper: common: send");
+            perror("sendto_img_wrapper: common: send");
             break;
         } else if (n <= 0) {
-            perror("send_img_wrapper: common: n <= 0");
+            perror("sendto_img_wrapper: common: n <= 0");
             break;
         }
 
@@ -86,12 +86,12 @@ int send_img_wrapper(int file_descriptor, char *message, int msg_size) {
     bytes_sent = 0;
     bytes_left = msg_size;
     while (bytes_sent < msg_size) {
-        n = send(file_descriptor, message + bytes_sent, bytes_left, 0);
+        n = sendto(file_descriptor, message + bytes_sent, bytes_left, 0, dest_addr, addrlen);
         if (n == -1) {
-            perror("send_img_wrapper: common: send");
+            perror("sendto_img_wrapper: common: send");
             break;
         } else if (n <= 0) {
-            perror("send_img_wrapper: common: n <= 0");
+            perror("sendto_img_wrapper: common: n <= 0");
             break;
         }
 
@@ -113,17 +113,18 @@ static int _msg_size_to_int(char * size) {
     return result;
 }
 
-int recv_wrapper(int file_descriptor, char **buffer) {
+// TODO set a timeout if no message is received
+int recvfrom_wrapper(int file_descriptor, char **buffer, struct sockaddr *src_addr, socklen_t *addrlen) {
     char header_buffer[HEADER_SIZE];
     int bytes_received = 0;
     int n;
     while (bytes_received < HEADER_SIZE - 1) {
-        n = recv(file_descriptor, header_buffer + bytes_received, HEADER_SIZE - 1 - bytes_received, 0);
+        n = recvfrom(file_descriptor, header_buffer + bytes_received, HEADER_SIZE - 1 - bytes_received, 0, src_addr, addrlen);
         if (n == -1) {
-            perror("recv_wrapper: common: header recv");
+            perror("recvfrom_wrapper: common: header recv");
             break;
         } else if (n <= 0) {
-            perror("recv_wrapper: common: header n <= 0");
+            perror("recvfrom_wrapper: common: header n <= 0");
             printf("n=%d", n);
             break;
         }
@@ -140,12 +141,12 @@ int recv_wrapper(int file_descriptor, char **buffer) {
     *buffer = malloc(sizeof(char*) * (msg_size + 1));
     bytes_received = 0;
     while (bytes_received < msg_size) {
-        n = recv(file_descriptor, (*buffer) + bytes_received, msg_size - bytes_received, 0);
+        n = recvfrom(file_descriptor, (*buffer) + bytes_received, msg_size - bytes_received, 0, src_addr, addrlen);
         if (n == -1) {
-            perror("recv_wrapper: common: msg recv");
+            perror("recvfrom_wrapper: common: msg recv");
             break;
         } else if (n <= 0) {
-            perror("recv_wrapper: common: n <= 0");
+            perror("recvfrom_wrapper: common: n <= 0");
             break;
         }
 
@@ -157,17 +158,18 @@ int recv_wrapper(int file_descriptor, char **buffer) {
     return msg_size - bytes_received; // return # of bytes not received
 }
 
-int recv_img_wrapper(int file_descriptor, char **buffer, int *size) {
+// TODO set a timeout if no message is received
+int recvfrom_img_wrapper(int file_descriptor, char **buffer, int *size, struct sockaddr *src_addr, socklen_t *addrlen) {
     char header_buffer[HEADER_SIZE];
     int bytes_received = 0;
     int n;
     while (bytes_received < HEADER_SIZE - 1) {
-        n = recv(file_descriptor, header_buffer + bytes_received, HEADER_SIZE - 1 - bytes_received, 0);
+        n = recvfrom(file_descriptor, header_buffer + bytes_received, HEADER_SIZE - 1 - bytes_received, 0, src_addr, addrlen);
         if (n == -1) {
-            perror("recv_img_wrapper: common: header recv");
+            perror("recvfrom_img_wrapper: common: header recv");
             break;
         } else if (n <= 0) {
-            perror("recv_img_wrapper: common: header n <= 0");
+            perror("recvfrom_img_wrapper: common: header n <= 0");
             break;
         }
 
@@ -183,12 +185,12 @@ int recv_img_wrapper(int file_descriptor, char **buffer, int *size) {
     *buffer = malloc(sizeof(char*) * (msg_size + 1));
     bytes_received = 0;
     while (bytes_received < msg_size) {
-        n = recv(file_descriptor, (*buffer) + bytes_received, msg_size - bytes_received, 0);
+        n = recvfrom(file_descriptor, (*buffer) + bytes_received, msg_size - bytes_received, 0, src_addr, addrlen);
         if (n == -1) {
-            perror("recv_img_wrapper: common: msg recv");
+            perror("recvfrom_img_wrapper: common: msg recv");
             break;
         } else if (n <= 0) {
-            perror("recv_img_wrapper: common: n <= 0");
+            perror("recvfrom_img_wrapper: common: n <= 0");
             break;
         }
 
