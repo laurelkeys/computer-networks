@@ -80,7 +80,6 @@ int send_img_wrapper(int file_descriptor, char *message, int msg_size) {
         bytes_sent += n;
         bytes_left -= n;
     }
-    printf("send_img_wrapper: header(%s)\n", header); // FIXME remove
     free(header);
 
     // Send picture
