@@ -120,10 +120,10 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     int img_size;
     recvfrom_img_wrapper(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
     if (img_size > 0) {
-        save_img(input_buffer, buffer, img_size);
-        printf("Foto de perfil salva: %s\n\n", input_buffer);
+        save_img(input_buffer+1, buffer, img_size);
+        printf("Foto de perfil salva: %s\n\n", input_buffer+1);
     } else {
-        printf("Nenhuma foto foi encontrada (%s)\n\n", input_buffer);
+        printf("Nenhuma foto foi encontrada (%s)\n\n", input_buffer+1);
     }
     free(buffer);
 }
@@ -156,10 +156,10 @@ void opt_get_profile(int socket_file_descriptor) {
     int img_size;
     recvfrom_img_wrapper(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
     if (img_size > 0) {
-        save_img(input_buffer, buffer, img_size);
-        printf("Foto de perfil salva: %s\n\n", input_buffer);
+        save_img(input_buffer+1, buffer, img_size);
+        printf("Foto de perfil salva: %s\n\n", input_buffer+1);
     } else {
-        printf("Nenhuma foto foi encontrada (%s)\n\n", input_buffer);
+        printf("Nenhuma foto foi encontrada (%s)\n\n", input_buffer+1);
     }
     free(buffer);
 }

@@ -42,7 +42,7 @@ void receive_message(int socket_file_descriptor) {
     char *buffer;
     // Read client message
     addr_len = sizeof(their_addr);
-    recvfrom_wrapper(socket_file_descriptor, &buffer, (struct sockaddr *)&their_addr, &addr_len); // FIXME receive all information at once
+    recvfrom_wrapper(socket_file_descriptor, &buffer, (struct sockaddr *)&their_addr, &addr_len); // receives all information at once
     printf("server: received from client: '%s'\n", buffer);
     
     opt = buffer[0];
@@ -90,9 +90,9 @@ void sendto_img_to_client(int socket_file_descriptor, FILE *f) {
             fread(img_buffer + i, 1, 1, f);
         }
 
-        sendto_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer), connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
+        sendto_img_wrapper(socket_file_descriptor, img_buffer, sizeof(img_buffer), (const struct sockaddr *)&their_addr, addr_len);
     } else {
-        sendto_img_wrapper(socket_file_descriptor, NULL, 0, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
+        sendto_wrapper(socket_file_descriptor, "Foto não encontrada", (const struct sockaddr *)&their_addr, addr_len);
     }
 }
 
@@ -201,7 +201,7 @@ void opt_get_profiles(int socket_file_descriptor) {
         f = fopen((email+1),"rb");
         printf("server: uploading picture to client: %s\n", (email+1));
         email[end-begin] = '\0';
-        sendto_wrapper(socket_file_descriptor, (email+8), connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
+        sendto_wrapper(socket_file_descriptor, (email+8), (const struct sockaddr *)&their_addr, addr_len);
         if (f) {
             sendto_img_to_client(socket_file_descriptor, f);
             fclose(f);
@@ -216,7 +216,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     }
 
     free(emails);
-    sendto_wrapper(socket_file_descriptor, "THATS ALL;", connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
+    sendto_wrapper(socket_file_descriptor, "THATS ALL;", (const struct sockaddr *)&their_addr, addr_len);
 }
 
 // CONNECTION ///////////////////////////
@@ -243,7 +243,7 @@ void *get_in_addr(struct sockaddr *sa) {
 void get_server_addrinfo(const char *hostname, const char *port, struct addrinfo **server_addrinfo) {
     struct addrinfo hints;
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = STRUCT_IPVX;
+    hints.ai_family = STRUCT_IPV4;
     hints.ai_socktype = UDP;
     hints.ai_flags = AI_PASSIVE; // use my IP
 
