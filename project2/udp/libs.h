@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/poll.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
@@ -29,6 +30,7 @@
 #define SOCKET_IPV6 PF_INET6
 
 #define OPT_QUIT_STR "4"
+#define TIMEOUT -2
 
 #define FILE_CLIENT "option_results.txt"
 #define FILE_SERVER "last_query_result.txt"

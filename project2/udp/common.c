@@ -36,7 +36,6 @@ int sendto_img_wrapper(int file_descriptor, char *message, int msg_size, const s
     return 0;
 }
 
-// TODO set a timeout if no message is received
 int recvfrom_wrapper(int file_descriptor, char **buffer, struct sockaddr *src_addr, socklen_t *addrlen) {
     int msg_size;
 
@@ -52,7 +51,28 @@ int recvfrom_wrapper(int file_descriptor, char **buffer, struct sockaddr *src_ad
     return msg_size; // return # of bytes not received
 }
 
-// TODO set a timeout if no message is received
+int recvfrom_wrapper_timeout(int file_descriptor, char **buffer, struct sockaddr *src_addr, socklen_t *addrlen, int timeout_in_s) {
+    *buffer = malloc(sizeof(char*) * MAX_MSG_SIZE);
+
+    struct pollfd fd;
+    fd.fd = file_descriptor;
+    fd.events = POLLIN;
+
+    if (poll(&fd, 1, timeout_in_s*1000) > 0) {
+        int msg_size;
+        msg_size = recvfrom(file_descriptor, (*buffer), MAX_MSG_SIZE, 0, src_addr, addrlen);
+        if (msg_size == -1) {
+            perror("recvfrom_wrapper_timeout: common: msg recv");
+            return 1;
+        }
+
+        (*buffer)[msg_size] = '\0';
+
+        return msg_size; // return # of bytes not received
+    }
+    return TIMEOUT;
+}
+
 int recvfrom_img_wrapper(int file_descriptor, char **buffer, int *size, struct sockaddr *src_addr, socklen_t *addrlen) {
     int msg_size;
 
@@ -67,4 +87,27 @@ int recvfrom_img_wrapper(int file_descriptor, char **buffer, int *size, struct s
 
     *size = msg_size;
     return msg_size; // return # of bytes not received
+}
+
+int recvfrom_img_wrapper_timeout(int file_descriptor, char **buffer, int *size, struct sockaddr *src_addr, socklen_t *addrlen, int timeout_in_s) {
+    *buffer = malloc(sizeof(char*) * MAX_MSG_SIZE);
+
+    struct pollfd fd;
+    fd.fd = file_descriptor;
+    fd.events = POLLIN;
+
+    if (poll(&fd, 1, timeout_in_s*1000) > 0) {
+        int msg_size;
+        msg_size = recvfrom(file_descriptor, (*buffer), MAX_MSG_SIZE, 0, src_addr, addrlen);
+        if (msg_size == -1) {
+            perror("recvfrom_img_wrapper_timeout: common: msg recv");
+            return 1;
+        }
+
+        (*buffer)[msg_size] = '\0';
+
+        *size = msg_size;
+        return msg_size; // return # of bytes not received
+    }
+    return TIMEOUT;
 }

@@ -1,6 +1,7 @@
 #include "client.h"
 
 struct addrinfo *connected_addrinfo;
+int timeout_in_s = 1;
 
 static void _check_args(int argc) {
     if (argc != 2) {
@@ -107,7 +108,11 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     char *buffer;
 
     // Print result
-    recvfrom_wrapper(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
+    return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
+    if (return_value == TIMEOUT) {
+        printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
+        return;
+    }
     printf("\n%s\n", buffer);
 
     // Save result
@@ -118,7 +123,12 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
 
     // Save picture
     int img_size;
-    recvfrom_img_wrapper(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
+    return_value = recvfrom_img_wrapper_timeout(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
+    if (return_value == TIMEOUT) {
+        printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
+        return;
+    }
+
     if (img_size > 0) {
         save_img(input_buffer+1, buffer, img_size);
         printf("Foto de perfil salva: %s\n\n", input_buffer+1);
@@ -143,7 +153,11 @@ void opt_get_profile(int socket_file_descriptor) {
     char *buffer;
 
     // Print result
-    recvfrom_wrapper(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
+    return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
+    if (return_value == TIMEOUT) {
+        printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
+        return;
+    }
     printf("\n%s\n", buffer);
 
     // Save result
@@ -154,7 +168,12 @@ void opt_get_profile(int socket_file_descriptor) {
 
     // Save picture
     int img_size;
-    recvfrom_img_wrapper(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
+    return_value = recvfrom_img_wrapper_timeout(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
+    if (return_value == TIMEOUT) {
+        printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
+        return;
+    }
+
     if (img_size > 0) {
         save_img(input_buffer+1, buffer, img_size);
         printf("Foto de perfil salva: %s\n\n", input_buffer+1);
@@ -171,7 +190,12 @@ void opt_get_profiles(int socket_file_descriptor) {
     char *buffer;
 
     // Print result
-    recvfrom_wrapper(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
+    int return_value;
+    return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
+    if (return_value == TIMEOUT) {
+        printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
+        return;
+    }
     printf("\n%s\n", buffer);
 
     // Save result
@@ -181,10 +205,20 @@ void opt_get_profiles(int socket_file_descriptor) {
     // Save pictures
     char *name;
     int img_size;
-    recvfrom_wrapper(socket_file_descriptor, &name, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
+    return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &name, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
+    if (return_value == TIMEOUT) {
+        printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
+        return;
+    }
+
     while (strcmp(name, "THATS ALL;\0")) {
         // Save picture
-        recvfrom_img_wrapper(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
+        return_value = recvfrom_img_wrapper_timeout(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
+        if (return_value == TIMEOUT) {
+            printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
+            return;
+        }
+          
         if (img_size > 0) {
             save_img(name, buffer, img_size);
             printf("Foto de perfil salva: %s\n\n", name);
@@ -195,7 +229,11 @@ void opt_get_profiles(int socket_file_descriptor) {
         free(name);
 
         // Get the next name or finish message ("THATS ALL;\0")
-        recvfrom_wrapper(socket_file_descriptor, &name, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen));
+        return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &name, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
+        if (return_value == TIMEOUT) {
+            printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
+            return;
+        }
     }
     printf("\n");
     free(name);
