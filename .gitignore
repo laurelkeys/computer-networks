@@ -12,7 +12,7 @@
 *.png
 *.jpg
 *.jpeg
-!*/imgs/*.png
+!**/imgs/*.png
 ./timestamps
 !Makefile
 
