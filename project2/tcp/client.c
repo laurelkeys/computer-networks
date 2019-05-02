@@ -101,6 +101,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
+    log_timestamp("tcp:t1:1:ok");
     send_wrapper(socket_file_descriptor, input_buffer);
 
     char *buffer;
@@ -118,6 +119,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     // Save picture
     int img_size;
     recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
+    log_timestamp("tcp:t4:1:ok");
     if (img_size > 0) {
         save_img(input_buffer, buffer, img_size);
         printf("Foto de perfil salva: %s\n\n", input_buffer);
@@ -137,6 +139,7 @@ void opt_get_profile(int socket_file_descriptor) {
     return_value = get_input("Digite o email do perfil> ", input_buffer, sizeof(input_buffer));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
+    log_timestamp("tcp:t1:2:ok");
     send_wrapper(socket_file_descriptor, input_buffer);
 
     char *buffer;
@@ -154,6 +157,7 @@ void opt_get_profile(int socket_file_descriptor) {
     // Save picture
     int img_size;
     recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
+    log_timestamp("tcp:t4:2:ok");
     if (img_size > 0) {
         save_img(input_buffer, buffer, img_size);
         printf("Foto de perfil salva: %s\n\n", input_buffer);
@@ -165,6 +169,7 @@ void opt_get_profile(int socket_file_descriptor) {
 
 void opt_get_profiles(int socket_file_descriptor) {
     // (3) listar todas as informações de todos os perfis
+    log_timestamp("tcp:t1:3:ok");
     send_wrapper(socket_file_descriptor, "3");
 
     char *buffer;
@@ -181,6 +186,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     char *name;
     int img_size;
     recv_wrapper(socket_file_descriptor, &name);
+    log_timestamp("tcp:t4:3:ok");
     while (strcmp(name, "THATS ALL;\0")) {
         // Save picture
         recv_img_wrapper(socket_file_descriptor, &buffer, &img_size);
