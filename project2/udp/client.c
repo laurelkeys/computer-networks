@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     // connects the socket referred to by socket_file_descriptor
     // to the first matching specified address in server_addrinfo (i.e. connected_addrinfo)
     int socket_file_descriptor;
-    connect_to_first_match(server_addrinfo, &socket_file_descriptor, &connected_addrinfo);
+    create_socket(server_addrinfo, &socket_file_descriptor, &connected_addrinfo);
     freeaddrinfo(server_addrinfo);
 
     // does the work :D
@@ -105,7 +105,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
         return;
     
     log_timestamp("udp:\n\nt1:1:ok");
-    sendto_wrapper(socket_file_descriptor, input_buffer, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen); // FIXME send all information at once
+    sendto_wrapper(socket_file_descriptor, input_buffer, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
 
     char *buffer;
 
@@ -154,7 +154,7 @@ void opt_get_profile(int socket_file_descriptor) {
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
     log_timestamp("udp:t1:2:ok");
-    sendto_wrapper(socket_file_descriptor, input_buffer, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen); // FIXME send all information at once
+    sendto_wrapper(socket_file_descriptor, input_buffer, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
 
     char *buffer;
 
@@ -281,8 +281,7 @@ void get_server_addrinfo(const char *hostname, const char *port, struct addrinfo
     }
 }
 
-// TODO rename
-void connect_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_descriptor, struct addrinfo **p) {
+void create_socket(struct addrinfo *server_addrinfo, int *socket_file_descriptor, struct addrinfo **p) {
     // loop through all the results and make a socket
     for (*p = server_addrinfo; *p != NULL; *p = (*p)->ai_next) {
         if ((*socket_file_descriptor = socket((*p)->ai_family, (*p)->ai_socktype, (*p)->ai_protocol)) == -1) {

@@ -4,7 +4,7 @@ void log_timestamp(char *label) {
     struct timeval t;
     gettimeofday(&t, NULL);
     FILE *f;
-    f = fopen(FILE_TIMESTAMPS,"a");
+    f = fopen(FILE_TIMESTAMPS, "a");
     if (f) {
         fprintf(f, "%s:%ldus\n", label, t.tv_usec);
         fclose(f);

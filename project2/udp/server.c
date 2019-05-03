@@ -263,12 +263,6 @@ void bind_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_desc
             continue;
         }
 
-        /*
-        if (setsockopt(*socket_file_descriptor, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-            perror("setsockopt");
-            exit(1);
-        }*/
-
         if (bind(*socket_file_descriptor, (*p)->ai_addr, (*p)->ai_addrlen) == -1) {
             close(*socket_file_descriptor);
             perror("server: bind");

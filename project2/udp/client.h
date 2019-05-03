@@ -8,7 +8,7 @@ void just_do_it(struct addrinfo *connected_addrinfo, int socket_file_descriptor)
 
 // CONNECTION ///////////////////////////
 void get_server_addrinfo(const char *hostname, const char *port, struct addrinfo **server_addrinfo);
-void connect_to_first_match(struct addrinfo *server_addrinfo, int *socket_file_descriptor, struct addrinfo **p);
+void create_socket(struct addrinfo *server_addrinfo, int *socket_file_descriptor, struct addrinfo **p);
 
 // OPTIONS //////////////////////////////
 void print_options_list();
