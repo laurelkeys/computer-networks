@@ -1,10 +1,13 @@
 #include "common.h"
 
-void log_timestamp(char *label) {
+void log_timestamp(char *label, int opt_file) {
     struct timeval t;
     gettimeofday(&t, NULL);
+    char file_name_buffer[strlen(FILE_TIMESTAMPS_PREFIX) + 1 + strlen(FILE_TIMESTAMPS_EXTENSION)];
+    sprintf(file_name_buffer, "%s%d%s", FILE_TIMESTAMPS_PREFIX, opt_file, FILE_TIMESTAMPS_EXTENSION);
+    printf("file_name_buffer: %s\n", file_name_buffer);
     FILE *f;
-    f = fopen(FILE_TIMESTAMPS, "a");
+    f = fopen(file_name_buffer, "a");
     if (f) {
         fprintf(f, "%s:%ldus\n", label, t.tv_usec);
         fclose(f);

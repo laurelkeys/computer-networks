@@ -34,6 +34,7 @@
 
 #define FILE_CLIENT "option_results.txt"
 #define FILE_SERVER "last_query_result.txt"
-#define FILE_TIMESTAMPS "timestamps.txt"
+#define FILE_TIMESTAMPS_PREFIX "timestamps"
+#define FILE_TIMESTAMPS_EXTENSION ".txt"
 
 #endif

@@ -104,7 +104,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
     
-    log_timestamp("udp:\n\nt1:1:ok");
+    log_timestamp("udp:t1:1:ok", 1);
     sendto_wrapper(socket_file_descriptor, input_buffer, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
 
     char *buffer;
@@ -112,7 +112,7 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     // Print result
     return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
     if (return_value == TIMEOUT) {
-        log_timestamp("udp:t4:1:timeout");
+        log_timestamp("udp:t4:1:timeout", 1);
         printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
         return;
     }
@@ -128,11 +128,11 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor) {
     int img_size;
     return_value = recvfrom_img_wrapper_timeout(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
     if (return_value == TIMEOUT) {
-        log_timestamp("udp:t4:1:timeout");
+        log_timestamp("udp:t4:1:timeout", 1);
         printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
         return;
     }
-    log_timestamp("udp:t4:1:ok");
+    log_timestamp("udp:t4:1:ok", 1);
 
     if (img_size > 0) {
         save_img(input_buffer+1, buffer, img_size);
@@ -153,7 +153,7 @@ void opt_get_profile(int socket_file_descriptor) {
     return_value = get_input("Digite o email do perfil> ", input_buffer+1, sizeof(input_buffer));
     if (validate_input(return_value, "\nEmail não digitado", "Email muito longo ", input_buffer) != OK)
         return;
-    log_timestamp("udp:t1:2:ok");
+    log_timestamp("udp:t1:2:ok", 2);
     sendto_wrapper(socket_file_descriptor, input_buffer, connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
 
     char *buffer;
@@ -161,7 +161,7 @@ void opt_get_profile(int socket_file_descriptor) {
     // Print result
     return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
     if (return_value == TIMEOUT) {
-        log_timestamp("udp:t4:2:timeout");
+        log_timestamp("udp:t4:2:timeout", 2);
         printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
         return;
     }
@@ -177,11 +177,11 @@ void opt_get_profile(int socket_file_descriptor) {
     int img_size;
     return_value = recvfrom_img_wrapper_timeout(socket_file_descriptor, &buffer, &img_size, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
     if (return_value == TIMEOUT) {
-        log_timestamp("udp:t4:2:timeout");
+        log_timestamp("udp:t4:2:timeout", 2);
         printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
         return;
     }
-    log_timestamp("udp:t4:2:ok");
+    log_timestamp("udp:t4:2:ok", 2);
 
     if (img_size > 0) {
         save_img(input_buffer+1, buffer, img_size);
@@ -194,7 +194,7 @@ void opt_get_profile(int socket_file_descriptor) {
 
 void opt_get_profiles(int socket_file_descriptor) {
     // (3) listar todas as informações de todos os perfis
-    log_timestamp("udp:t1:3:ok");
+    log_timestamp("udp:t1:3:ok", 3);
     sendto_wrapper(socket_file_descriptor, "3", connected_addrinfo->ai_addr, connected_addrinfo->ai_addrlen);
 
     char *buffer;
@@ -203,7 +203,7 @@ void opt_get_profiles(int socket_file_descriptor) {
     int return_value;
     return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &buffer, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
     if (return_value == TIMEOUT) {
-        log_timestamp("udp:t4:3:timeout");
+        log_timestamp("udp:t4:3:timeout", 3);
         printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
         return;
     }
@@ -219,11 +219,11 @@ void opt_get_profiles(int socket_file_descriptor) {
     int img_size;
     return_value = recvfrom_wrapper_timeout(socket_file_descriptor, &name, connected_addrinfo->ai_addr, &(connected_addrinfo->ai_addrlen), timeout_in_s);
     if (return_value == TIMEOUT) {
-        log_timestamp("udp:t4:3:timeout");
+        log_timestamp("udp:t4:3:timeout", 3);
         printf("\nO servidor não respondeu a tempo (timeout de %ds atingido)\n\n", timeout_in_s);
         return;
     }
-    log_timestamp("udp:t4:3:ok");
+    log_timestamp("udp:t4:3:ok", 3);
 
     while (strcmp(name, "THATS ALL;\0")) {
         // Save picture

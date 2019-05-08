@@ -103,9 +103,9 @@ void opt_get_full_name_and_picture_from_profile(int socket_file_descriptor, char
     printf("server: client selected option 1:\n");
     printf("server: email '%s'\n", email);
 
-    log_timestamp("udp:t2:1:ok");
+    log_timestamp("udp:t2:1:ok", 1);
     get_full_name_from_profile_sql(email); // queries database
-    log_timestamp("udp:t3:1:ok");
+    log_timestamp("udp:t3:1:ok", 1);
 
     // Send name and surname
     FILE *f = fopen(FILE_SERVER, "r");
@@ -132,9 +132,9 @@ void opt_get_profile(int socket_file_descriptor, char *email) {
     printf("server: client selected option 2:\n");
     printf("server: email '%s'\n", email);
 
-    log_timestamp("udp:t2:2:ok");
+    log_timestamp("udp:t2:2:ok", 2);
     opt_get_profile_sql(email); // queries database
-    log_timestamp("udp:t3:2:ok");
+    log_timestamp("udp:t3:2:ok", 2);
 
     // Send profile info
     FILE *f = fopen(FILE_SERVER, "r");
@@ -160,9 +160,9 @@ void opt_get_profiles(int socket_file_descriptor) {
     // (3) listar todas as informações de todos os perfis
     printf("server: client selected option 3:\n");
 
-    log_timestamp("udp:t2:3:ok");
+    log_timestamp("udp:t2:3:ok", 3);
     opt_get_profiles_sql(); // queries database
-    log_timestamp("udp:t3:3:ok");
+    log_timestamp("udp:t3:3:ok", 3);
 
     // Send profiles info
     FILE *f = fopen(FILE_SERVER, "r");
