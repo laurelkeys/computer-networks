@@ -6,7 +6,7 @@
 
 #define HEADER_SIZE 12 + 1 // + 1 to add '\0'
 
-void log_timestamp(char *label);
+void log_timestamp(char *label, int opt_file);
 
 int send_wrapper(int file_descriptor, char *message);
 int recv_wrapper(int file_descriptor, char **buffer);
