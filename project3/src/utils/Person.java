@@ -1,3 +1,6 @@
+package utils;
+
+import java.util.ArrayList;
 
 public class Person {
     private String email;
@@ -5,8 +8,8 @@ public class Person {
     private String surname;
     private String city;
     private String education;
-    private Array<String> skills;
-    private Array<String> experiences;
+    private ArrayList<String> skills;
+    private ArrayList<String> experiences;
 
     // TODO getters and setters, or not?
 }

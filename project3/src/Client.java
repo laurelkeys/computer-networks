@@ -5,16 +5,16 @@ import java.rmi.RemoteException;
 
 import javax.swing.JOptionPane;
 
-import RMIInterface;
-import Util;
+import utils.Interface;
+import utils.Constants;
 
 public class Client {
-	private static RMIInterface look_up;
+	private static Interface look_up;
 
 	public static void main(String[] args) 
 		throws MalformedURLException, RemoteException, NotBoundException {
 		
-		look_up = (RMIInterface) Naming.lookup(Util.ADDRESS);
+		look_up = (Interface) Naming.lookup(Constants.ADDRESS);
 		String txt = JOptionPane.showInputDialog("What is your name?");
 			
 		String response = look_up.helloTo(txt);

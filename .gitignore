@@ -71,3 +71,6 @@ dkms.conf
 
 # Mac OS
 .DS_Store
+
+# Java
+.class
