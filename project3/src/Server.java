@@ -31,7 +31,7 @@ public class Server extends UnicastRemoteObject implements Interface{
     }
 
     @Override
-    public String addExperience(String email) throws RemoteException {
+    public String addExperience(String email, String experience) throws RemoteException {
         return null;
     }
 

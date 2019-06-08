@@ -11,7 +11,7 @@ public interface Interface extends Remote {
 
     public ArrayList<Person> getAllWithEducation(String education) throws RemoteException;
     public ArrayList<String> getSkills(String city) throws RemoteException;
-    public String addExperience(String email) throws RemoteException;
+    public String addExperience(String email, String experience) throws RemoteException;
     public ArrayList<String> getExperience(String email) throws RemoteException;
     public ArrayList<Person> getAllProfiles() throws RemoteException;
     public Person getProfile(String email) throws RemoteException;
