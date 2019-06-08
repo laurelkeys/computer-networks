@@ -1,0 +1,1 @@
+rm -f src/*.class src/utils/*.class
