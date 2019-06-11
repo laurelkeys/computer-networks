@@ -1,3 +1,5 @@
+package src;
+
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -5,11 +7,15 @@ import java.rmi.RemoteException;
 
 import javax.swing.JOptionPane;
 
-import utils.Interface;
-import utils.Constants;
+import java.util.ArrayList;
+import java.io.IOException;
+
+import src.utils.Interface;
+import src.utils.Constants;
+import src.utils.Person;
 
 public class Client {
-	private static Interface look_up;
+	private static Interface server;
 
 	private static void printMenu(){
 		System.out.printf("Escolha uma das seguintes opções:\n");
@@ -22,48 +28,76 @@ public class Client {
 		System.out.printf("(7) sair.\n\n");
 	}
 
+	private static void opt1() throws RemoteException {
+		System.out.print("Digite o curso> ");
+		String education = System.console().readLine();
+		ArrayList<Person> results = server.getAllWithEducation(education);
+	}
+
+	private static void opt2() throws RemoteException {
+		System.out.print("Digite a cidade> ");
+		String city = System.console().readLine();
+		ArrayList<String> results = server.getSkills(city);
+	}
+
+	private static void opt3() throws RemoteException {
+		System.out.print("Digite o email> ");
+		String email = System.console().readLine();
+		System.out.print("Digite a habilidade> ");
+		String experience = System.console().readLine();
+		String results = server.addExperience(email,experience);
+		if (results == "Done") {
+			System.out.println("Experiencia adicionada com sucesso");
+		} else {
+			System.out.println("Algum erro aconteceu");
+		}
+	}
+	private static void opt4() throws RemoteException {
+		System.out.print("Digite o email> ");
+		String email = System.console().readLine();
+		ArrayList<String> results = server.getExperience(email);
+	}
+	private static void opt5() throws RemoteException {
+		ArrayList<Person> results = server.getAllProfiles();
+	}
+	private static void opt6() throws RemoteException {
+		System.out.print("Digite o email> ");
+		String email = System.console().readLine();
+		Person results = server.getProfile(email);
+	}
+
 	public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
-		look_up = (Interface) Naming.lookup(Constants.ADDRESS);
+		server = (Interface) Naming.lookup(Constants.ADDRESS);
 		boolean quit = false;
-		String email;
-		String education;
-		String experience;
-		String city;
+		int option;
 
 		while (!quit) {
 			printMenu();
-			option = System.in.read();
+			try {
+				option = (int) System.in.read();
+			} catch (IOException e) {
+				System.out.println("Input inválido");
+				continue;
+			}
 			option = (option >= 1 && option <= 6) ? option : 7;
 			switch (option) {
 				case 1:
-					System.out.print("Digite o curso> ");
-					education = System.in.read();
-					results = getAllWithEducation(education);
+					opt1();
 					break;
 				case 2:
-					System.out.print("Digite a cidade> ");
-					city = System.in.read();
-					results = getSkills(city);
+					opt2();
 					break;
 				case 3:
-					System.out.print("Digite o email> ");
-					email = System.in.read();
-					System.out.print("Digite a habilidade> ");
-					experience = System.in.read();
-					results = addExperience(email,experience);
+					opt3();
 					break;
 				case 4:
-					System.out.print("Digite o email> ");
-					email = System.in.read();
-					results = getExperience(email);
+					opt4();
 					break;
 				case 5:
-					results = getAllProfiles();
+					opt5();
 					break;
-				case 5:
-					System.out.print("Digite o email> ");
-					email = System.in.read();
-					results = getProfile(email);
+				case 6:
+					opt6();
 					break;
 				default:
 					quit = true;
@@ -71,9 +105,9 @@ public class Client {
 			}
 		}
 		
-		String txt = JOptionPane.showInputDialog("What is your name?");
+		// String txt = JOptionPane.showInputDialog("What is your name?");
 		
-		String response = look_up.helloTo(txt);
-		JOptionPane.showMessageDialog(null, response);
+		// String response = look_up.helloTo(txt);
+		// JOptionPane.showMessageDialog(null, response);
 	}
 }

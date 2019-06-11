@@ -1,10 +1,10 @@
-package utils;
+package src.utils;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-import utils.Person;
+import src.utils.Person;
 
 public interface Interface extends Remote {
     public String helloTo(String name) throws RemoteException;

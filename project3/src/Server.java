@@ -1,11 +1,13 @@
+package src;
+
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-import utils.Interface;
-import utils.Constants;
-import utils.Person;
+import src.utils.Interface;
+import src.utils.Constants;
+import src.utils.Person;
 
 public class Server extends UnicastRemoteObject implements Interface{
     private static final long serialVersionUID = 1L;
@@ -32,7 +34,7 @@ public class Server extends UnicastRemoteObject implements Interface{
 
     @Override
     public String addExperience(String email, String experience) throws RemoteException {
-        return null;
+        return "Done";
     }
 
     @Override
