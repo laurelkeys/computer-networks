@@ -41,7 +41,7 @@ public class Client {
         String email = System.console().readLine();
         System.out.print("Digite a habilidade> ");
         String experience = System.console().readLine();
-        Boolean added = server.addExperience(email, experience);
+        boolean added = server.addExperience(email, experience);
         if (added) {
             System.out.println("Experiencia adicionada com sucesso");
         } else {
@@ -69,17 +69,19 @@ public class Client {
         if (System.getSecurityManager() == null) System.setSecurityManager(new SecurityManager());
 
         server = (Interface) Naming.lookup(Constants.ADDRESS);
-        boolean quit = false;
-        int option;
 
+        int option;
+        boolean quit = false;
         while (!quit) {
             printMenu();
+
             try {
-                option = (int) System.in.read();
+                option = System.in.read();
             } catch (IOException e) {
                 System.out.println("Input inválido");
                 continue;
             }
+
             option = (option >= 1 && option <= 6) ? option : 7;
             switch (option) {
                 case 1:

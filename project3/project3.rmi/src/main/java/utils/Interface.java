@@ -12,7 +12,7 @@ public interface Interface extends Remote {
 
     ArrayList<String> getSkills(String city) throws RemoteException;
 
-    Boolean addExperience(String email, String experience) throws RemoteException;
+    boolean addExperience(String email, String experience) throws RemoteException;
 
     ArrayList<String> getExperience(String email) throws RemoteException;
 

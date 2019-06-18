@@ -32,7 +32,7 @@ public class Server extends UnicastRemoteObject implements Interface {
     }
 
     @Override
-    public Boolean addExperience(String email, String experience) throws RemoteException {
+    public boolean addExperience(String email, String experience) throws RemoteException {
         return false;
     }
 
