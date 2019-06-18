@@ -32,8 +32,8 @@ public class Server extends UnicastRemoteObject implements Interface {
     }
 
     @Override
-    public String addExperience(String email, String experience) throws RemoteException {
-        return "Done";
+    public Boolean addExperience(String email, String experience) throws RemoteException {
+        return false;
     }
 
     @Override
@@ -52,6 +52,8 @@ public class Server extends UnicastRemoteObject implements Interface {
     }
 
     public static void main(String[] args) {
+        if (System.getSecurityManager() == null) System.setSecurityManager(new SecurityManager());
+
         try {
             Naming.rebind(Constants.ADDRESS, new Server());
             System.err.println("Server ready");

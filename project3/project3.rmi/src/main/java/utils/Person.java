@@ -1,11 +1,12 @@
 package utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Person {
+public class Person implements Serializable {
 
     private String email;
-    private String nome;
+    private String name;
     private String surname;
     private String city;
     private String education;

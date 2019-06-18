@@ -41,8 +41,8 @@ public class Client {
         String email = System.console().readLine();
         System.out.print("Digite a habilidade> ");
         String experience = System.console().readLine();
-        String results = server.addExperience(email, experience);
-        if (results.equals("Done")) {
+        Boolean added = server.addExperience(email, experience);
+        if (added) {
             System.out.println("Experiencia adicionada com sucesso");
         } else {
             System.out.println("Algum erro aconteceu");
@@ -66,6 +66,8 @@ public class Client {
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
+        if (System.getSecurityManager() == null) System.setSecurityManager(new SecurityManager());
+
         server = (Interface) Naming.lookup(Constants.ADDRESS);
         boolean quit = false;
         int option;
