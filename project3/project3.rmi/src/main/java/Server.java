@@ -1,5 +1,5 @@
 import utils.Constants;
-import utils.Interface;
+import utils.DataKeeper;
 import utils.Person;
 
 import java.rmi.Naming;
@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class Server extends UnicastRemoteObject implements Interface {
+public class Server extends UnicastRemoteObject implements DataKeeper {
 
     private static final long serialVersionUID = 1L;
 

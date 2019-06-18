@@ -1,5 +1,5 @@
 import utils.Constants;
-import utils.Interface;
+import utils.DataKeeper;
 import utils.Person;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class Client {
 
-    private static Interface server;
+    private static DataKeeper server;
 
     private static void printMenu() {
         System.out.printf("Escolha uma das seguintes opções:\n");
@@ -68,7 +68,7 @@ public class Client {
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
         if (System.getSecurityManager() == null) System.setSecurityManager(new SecurityManager());
 
-        server = (Interface) Naming.lookup(Constants.ADDRESS);
+        server = (DataKeeper) Naming.lookup(Constants.ADDRESS);
 
         int option;
         boolean quit = false;

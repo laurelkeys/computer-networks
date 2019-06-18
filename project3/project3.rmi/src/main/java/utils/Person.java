@@ -15,5 +15,16 @@ public class Person implements Serializable {
     private ArrayList<String> skills;
     private ArrayList<String> experiences;
 
+    @Override
+    public String toString() {
+        return "Email: " + email
+                + "\nNome: " + name
+                + "\nSobrenome: " + surname
+                + "\nResidência: " + city
+                + "\nFormação Acadêmica: " + education
+                + "\nHabilidades: " + String.join(", ", skills)
+                + "\nExperiência: " + String.join(", ", experiences);
+    }
+
     // TODO getters and setters, or not?
 }

@@ -4,7 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public interface Interface extends Remote {
+public interface DataKeeper extends Remote {
 
     String helloTo(String name) throws RemoteException;
 
