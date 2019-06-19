@@ -52,8 +52,6 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
     }
 
     public static void main(String[] args) {
-        if (System.getSecurityManager() == null) System.setSecurityManager(new SecurityManager());
-
         try {
             Naming.rebind(Constants.ADDRESS, new Server());
             System.err.println("Server ready");

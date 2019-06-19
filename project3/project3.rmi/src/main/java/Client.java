@@ -66,8 +66,6 @@ public class Client {
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
-        if (System.getSecurityManager() == null) System.setSecurityManager(new SecurityManager());
-
         server = (DataKeeper) Naming.lookup(Constants.ADDRESS);
 
         int option;
