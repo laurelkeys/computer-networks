@@ -6,6 +6,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static java.lang.System.err;
 import static java.lang.System.out;
@@ -14,8 +15,27 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
 
     private static final long serialVersionUID = 1L;
 
+    private HashMap<String, Person> database = new HashMap<>();
+
     private Server() throws RemoteException {
         super();
+        initDB();
+    }
+
+    private void initDB() {
+        Person uno = new Person("uno@mail.com", "Uno", "Dos", "Campinas", "Linguistics");
+        Person tres = new Person("tres@mail.com", "Tres", "Cuatro", "Campinas", "CS");
+        Person cinco = new Person("cinco@mail.com", "Cinco", "Seis", "Seattle", "CS");
+
+        // TODO add skills and experiences
+
+        insert(uno);
+        insert(tres);
+        insert(cinco);
+    }
+
+    private void insert(Person person) {
+        database.put(person.getEmail(), person);
     }
 
     @Override

@@ -10,10 +10,26 @@ public class Person implements Serializable {
     private String email;
     private String name;
     private String surname;
+
     private String city;
     private String education;
     private ArrayList<String> skills;
     private ArrayList<String> experiences;
+
+    public Person(String email, String name, String surname, String city, String education,
+                  ArrayList<String> skills, ArrayList<String> experiences) {
+        this.email = email;
+        this.name = name;
+        this.surname = surname;
+        this.city = city;
+        this.education = education;
+        this.skills = skills;
+        this.experiences = experiences;
+    }
+
+    public Person(String email, String name, String surname, String city, String education) {
+        this(email, name, surname, city, education, new ArrayList<>(), new ArrayList<>());
+    }
 
     @Override
     public String toString() {
@@ -26,5 +42,39 @@ public class Person implements Serializable {
                 + "\nExperiência: " + String.join(", ", experiences);
     }
 
-    // TODO getters and setters, or not?
+    public String getEmail() {
+        return email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getEducation() {
+        return education;
+    }
+
+    public ArrayList<String> getSkills() {
+        return skills;
+    }
+
+    public ArrayList<String> getExperiences() {
+        return experiences;
+    }
+
+    public void addSkill(String skill) {
+        skills.add(skill);
+    }
+
+    public void addExperience(String experience) {
+        experiences.add(experience);
+    }
 }
