@@ -1,6 +1,7 @@
 import utils.Constants;
 import utils.DataKeeper;
 import utils.Person;
+import utils.results.DataResult;
 
 import java.io.IOError;
 import java.net.MalformedURLException;
@@ -30,17 +31,16 @@ public class Client {
     private static void opt1() throws RemoteException {
         out.print("Digite o curso> ");
         String education = console().readLine();
-        ArrayList<Person> results = server.getAllWithEducation(education);
-
-        out.println(Arrays.toString(results.toArray()));
+        //ArrayList<Person> results = server.getAllWithEducation(education);
+        DataResult result = server.getAllWithEducation(education);
+        out.println(result.printable());
     }
 
     private static void opt2() throws RemoteException {
         out.print("Digite a cidade> ");
         String city = console().readLine();
-        ArrayList<String> results = server.getSkills(city);
-
-        out.println(Arrays.toString(results.toArray()));
+        DataResult result = server.getSkills(city);
+        out.println(result.printable());
     }
 
     private static void opt3() throws RemoteException {
@@ -48,35 +48,27 @@ public class Client {
         String email = console().readLine();
         out.print("Digite a habilidade> ");
         String experience = console().readLine();
-        boolean added = server.addExperience(email, experience);
-
-        if (added) {
-            out.println("Experiência adicionada com sucesso");
-        } else {
-            out.println("Algum erro aconteceu");
-        }
+        DataResult result = server.addExperience(email, experience);
+        out.println(result.printable());
     }
 
     private static void opt4() throws RemoteException {
         out.print("Digite o email> ");
         String email = console().readLine();
-        ArrayList<String> results = server.getExperience(email);
-
-        out.println(Arrays.toString(results.toArray()));
+        DataResult result = server.getExperience(email);
+        out.println(result.printable());
     }
 
     private static void opt5() throws RemoteException {
-        ArrayList<Person> results = server.getAllProfiles();
-
-        out.println(Arrays.toString(results.toArray()));
+        DataResult result = server.getAllProfiles();
+        out.println(result.printable());
     }
 
     private static void opt6() throws RemoteException {
         out.print("Digite o email> ");
         String email = console().readLine();
-        Person results = server.getProfile(email);
-
-        out.println(results.toString());
+        DataResult result = server.getProfile(email);
+        out.println(result.printable());
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {

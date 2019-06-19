@@ -1,6 +1,8 @@
 package utils.results;
 
-public interface DataResult<T> {
+import java.io.Serializable;
+
+public interface DataResult<T> extends Serializable {
 
     T getData();
 

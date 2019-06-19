@@ -1,6 +1,8 @@
 import utils.Constants;
 import utils.DataKeeper;
 import utils.Person;
+import utils.results.DataResult;
+import utils.results.options.*;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -32,8 +34,8 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
         cinco.addSkill("Spanish", "English", "Reap", "Sow");
 
         uno.addExperience("Work", "Research");
-        tres.addSkill("Work", "Study");
-        cinco.addSkill("Study", "Work", "Study more");
+        tres.addExperience("Work", "Study");
+        cinco.addExperience("Study", "Work", "Study more");
 
         insert(uno);
         insert(tres);
@@ -44,52 +46,53 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
         database.put(person.getEmail(), person);
     }
 
+
     @Override
-    public ArrayList<Person> getAllWithEducation(String education) throws RemoteException {
+    public DataResult getAllWithEducation(String education) throws RemoteException {
         ArrayList<Person> result = new ArrayList<>();
         for (Person person : database.values()) {
             if (person.getEducation().equals(education)) {
                 result.add(person);
             }
         }
-        return result;
+        return new ResultOpt1(result);
     }
 
     @Override
-    public ArrayList<String> getSkills(String city) throws RemoteException {
+    public DataResult getSkills(String city) throws RemoteException {
         ArrayList<String> result = new ArrayList<>();
         for (Person person : database.values()) {
             if (person.getCity().equals(city)) {
                 result.addAll(person.getSkills());
             }
         }
-        return result; // TODO remove duplicates if necessary
+        return new ResultOpt2(result); // TODO remove duplicates if necessary
     }
 
     @Override
-    public boolean addExperience(String email, String experience) throws RemoteException {
+    public DataResult addExperience(String email, String experience) throws RemoteException {
         Person person = database.get(email);
         if (person != null) {
             person.addExperience(experience);
-            return true; // TODO check that the experience has been added
+            return new ResultOpt3(true); // TODO check that the experience has been added
         }
-        return false;
+        return new ResultOpt3(false);
     }
 
     @Override
-    public ArrayList<String> getExperience(String email) throws RemoteException {
+    public DataResult getExperience(String email) throws RemoteException {
         Person person = database.get(email);
-        return person != null ? person.getExperiences() : new ArrayList<>();
+        return new ResultOpt4(person != null ? person.getExperiences() : new ArrayList<>());
     }
 
     @Override
-    public ArrayList<Person> getAllProfiles() throws RemoteException {
-        return new ArrayList<>(database.values());
+    public DataResult getAllProfiles() throws RemoteException {
+        return new ResultOpt5(new ArrayList<>(database.values()));
     }
 
     @Override
-    public Person getProfile(String email) throws RemoteException {
-        return database.get(email);
+    public DataResult getProfile(String email) throws RemoteException {
+        return new ResultOpt6(database.get(email));
     }
 
     public static void main(String[] args) {
