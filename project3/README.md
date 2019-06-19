@@ -1,12 +1,10 @@
-#To run the Server:
-Run first:
-`rmiregistry PORT_NUMBER &`
-where PORT_NUMBER is the choosen port.
+### 1. Start a remote object registry:
+- Run  `rmiregistry [PORT_NUMBER] &`,  where PORT_NUMBER is the choosen port (1099 by default).
 
-Then on the folder:
-`java Server`
+### 2. Run the server:
+- Go to the folder **project3.rmi\src\main\java**
+- Run `java Server`
 
-
-#To run the Client:
-On the folder simply run:
-`java Client`
+### 3. Run the client:
+- Go to the folder **project3.rmi\src\main\java**
+- Run `java Client`
