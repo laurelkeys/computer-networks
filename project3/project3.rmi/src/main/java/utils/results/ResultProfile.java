@@ -12,7 +12,12 @@ public class ResultProfile implements DataResult<Person> {
     }
 
     @Override
+    public Person getData() {
+        return data;
+    }
+
+    @Override
     public String printable() {
-        return data.toString(); // FIXME
+        return data.toString(); // FIXME on inherit classes
     }
 }

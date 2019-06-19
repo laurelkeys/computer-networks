@@ -15,7 +15,12 @@ public class ResultProfiles implements DataResult<ArrayList<Person>> {
     }
 
     @Override
+    public ArrayList<Person> getData() {
+        return data;
+    }
+
+    @Override
     public String printable() {
-        return Arrays.toString(data.toArray()); // FIXME
+        return Arrays.toString(data.toArray()); // FIXME on inherit classes
     }
 }

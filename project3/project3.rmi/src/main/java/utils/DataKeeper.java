@@ -2,19 +2,18 @@ package utils;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 
 public interface DataKeeper extends Remote {
 
-    ArrayList<Person> getAllWithEducation(String education) throws RemoteException;
+    <T> DataResult<T> getAllWithEducation(String education) throws RemoteException;
 
-    ArrayList<String> getSkills(String city) throws RemoteException;
+    <T> DataResult<T> getSkills(String city) throws RemoteException;
 
-    boolean addExperience(String email, String experience) throws RemoteException;
+    <T> DataResult<T> addExperience(String email, String experience) throws RemoteException;
 
-    ArrayList<String> getExperience(String email) throws RemoteException;
+    <T> DataResult<T> getExperience(String email) throws RemoteException;
 
-    ArrayList<Person> getAllProfiles() throws RemoteException;
+    <T> DataResult<T> getAllProfiles() throws RemoteException;
 
-    Person getProfile(String email) throws RemoteException;
+    <T> DataResult<T> getProfile(String email) throws RemoteException;
 }

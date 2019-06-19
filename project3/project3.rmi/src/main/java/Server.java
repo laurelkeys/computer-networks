@@ -1,11 +1,10 @@
 import utils.Constants;
 import utils.DataKeeper;
-import utils.Person;
+import utils.results.options.*;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 
 import static java.lang.System.err;
 import static java.lang.System.out;
@@ -19,32 +18,32 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
     }
 
     @Override
-    public ArrayList<Person> getAllWithEducation(String education) throws RemoteException {
+    public ResultOpt1 getAllWithEducation(String education) throws RemoteException {
         return null;
     }
 
     @Override
-    public ArrayList<String> getSkills(String city) throws RemoteException {
+    public ResultOpt2 getSkills(String city) throws RemoteException {
         return null;
     }
 
     @Override
-    public boolean addExperience(String email, String experience) throws RemoteException {
-        return false;
+    public ResultOpt3 addExperience(String email, String experience) throws RemoteException {
+        return new ResultOpt3(false);
     }
 
     @Override
-    public ArrayList<String> getExperience(String email) throws RemoteException {
+    public ResultOpt4 getExperience(String email) throws RemoteException {
         return null;
     }
 
     @Override
-    public ArrayList<Person> getAllProfiles() throws RemoteException {
+    public ResultOpt5 getAllProfiles() throws RemoteException {
         return null;
     }
 
     @Override
-    public Person getProfile(String email) throws RemoteException {
+    public ResultOpt6 getProfile(String email) throws RemoteException {
         return null;
     }
 

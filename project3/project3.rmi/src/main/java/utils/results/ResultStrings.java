@@ -14,7 +14,12 @@ public class ResultStrings implements DataResult<ArrayList<String>> {
     }
 
     @Override
+    public ArrayList<String> getData() {
+        return data;
+    }
+
+    @Override
     public String printable() {
-        return Arrays.toString(data.toArray()); // FIXME
+        return Arrays.toString(data.toArray()); // FIXME on inherit classes
     }
 }

@@ -11,6 +11,11 @@ public class ResultString implements DataResult<String> {
     }
 
     @Override
+    public String getData() {
+        return data;
+    }
+
+    @Override
     public String printable() {
         return data;
     }
