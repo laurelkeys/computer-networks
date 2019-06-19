@@ -8,6 +8,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static java.lang.System.*;
 
@@ -30,12 +31,16 @@ public class Client {
         out.print("Digite o curso> ");
         String education = console().readLine();
         ArrayList<Person> results = server.getAllWithEducation(education);
+
+        out.println(Arrays.toString(results.toArray()));
     }
 
     private static void opt2() throws RemoteException {
         out.print("Digite a cidade> ");
         String city = console().readLine();
         ArrayList<String> results = server.getSkills(city);
+
+        out.println(Arrays.toString(results.toArray()));
     }
 
     private static void opt3() throws RemoteException {
@@ -44,8 +49,9 @@ public class Client {
         out.print("Digite a habilidade> ");
         String experience = console().readLine();
         boolean added = server.addExperience(email, experience);
+
         if (added) {
-            out.println("Experiencia adicionada com sucesso");
+            out.println("Experiência adicionada com sucesso");
         } else {
             out.println("Algum erro aconteceu");
         }
@@ -55,16 +61,22 @@ public class Client {
         out.print("Digite o email> ");
         String email = console().readLine();
         ArrayList<String> results = server.getExperience(email);
+
+        out.println(Arrays.toString(results.toArray()));
     }
 
     private static void opt5() throws RemoteException {
         ArrayList<Person> results = server.getAllProfiles();
+
+        out.println(Arrays.toString(results.toArray()));
     }
 
     private static void opt6() throws RemoteException {
         out.print("Digite o email> ");
         String email = console().readLine();
         Person results = server.getProfile(email);
+
+        out.println(results.toString());
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
@@ -83,12 +95,24 @@ public class Client {
             }
 
             switch (option) {
-                case 1: opt1(); break;
-                case 2: opt2(); break;
-                case 3: opt3(); break;
-                case 4: opt4(); break;
-                case 5: opt5(); break;
-                case 6: opt6(); break;
+                case 1:
+                    opt1();
+                    break;
+                case 2:
+                    opt2();
+                    break;
+                case 3:
+                    opt3();
+                    break;
+                case 4:
+                    opt4();
+                    break;
+                case 5:
+                    opt5();
+                    break;
+                case 6:
+                    opt6();
+                    break;
                 default:
                     quit = true;
                     break;

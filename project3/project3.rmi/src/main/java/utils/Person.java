@@ -74,7 +74,15 @@ public class Person implements Serializable {
         skills.add(skill);
     }
 
+    public void addSkill(String... skills) {
+        for (String skill : skills) addSkill(skill);
+    }
+
     public void addExperience(String experience) {
         experiences.add(experience);
+    }
+
+    public void addExperience(String... experiences) {
+        for (String experience : experiences) addExperience(experience);
     }
 }
