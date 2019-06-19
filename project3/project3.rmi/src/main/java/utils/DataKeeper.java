@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 public interface DataKeeper extends Remote {
 
-    String helloTo(String name) throws RemoteException;
-
     ArrayList<Person> getAllWithEducation(String education) throws RemoteException;
 
     ArrayList<String> getSkills(String city) throws RemoteException;

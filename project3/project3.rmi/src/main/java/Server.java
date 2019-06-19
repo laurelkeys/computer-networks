@@ -7,18 +7,15 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
+
 public class Server extends UnicastRemoteObject implements DataKeeper {
 
     private static final long serialVersionUID = 1L;
 
     private Server() throws RemoteException {
         super();
-    }
-
-    @Override
-    public String helloTo(String name) throws RemoteException {
-        System.err.println(name + " is trying to contact!");
-        return "Server says hello to " + name;
     }
 
     @Override
@@ -54,9 +51,9 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
     public static void main(String[] args) {
         try {
             Naming.rebind(Constants.ADDRESS, new Server());
-            System.err.println("Server ready");
+            out.println("Server ready");
         } catch (Exception e) {
-            System.err.println("Server exception: " + e.toString());
+            err.println("Server exception: " + e.toString());
             e.printStackTrace();
         }
     }
