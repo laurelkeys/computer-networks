@@ -2,6 +2,7 @@ import utils.Constants;
 import utils.DataKeeper;
 import utils.Person;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -14,7 +15,7 @@ public class Client {
     private static DataKeeper server;
 
     private static void printMenu() {
-        System.out.printf("Escolha uma das seguintes opções:\n");
+        System.out.printf("\nEscolha uma das seguintes opções:\n");
         System.out.printf("(1) listar todas as pessoas formadas em um determinado curso;\n");
         System.out.printf("(2) listar as habilidades dos perfis que moram em uma determinada cidade;\n");
         System.out.printf("(3) acrescentar uma nova experiência em um perfil;\n");
@@ -74,8 +75,8 @@ public class Client {
             printMenu();
 
             try {
-                option = System.in.read();
-            } catch (IOException e) {
+                option = Integer.parseInt(System.console().readLine());
+            } catch (IOError e) {
                 System.out.println("Input inválido");
                 continue;
             }
