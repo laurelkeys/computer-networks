@@ -74,3 +74,12 @@ dkms.conf
 
 # Java
 .class
+*.class
+
+# IntelliJ
+out/
+build/
+.idea/
+gradle/
+.gradle/
+gradlew.*
