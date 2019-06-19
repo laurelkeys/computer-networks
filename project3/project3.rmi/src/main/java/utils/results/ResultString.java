@@ -1,7 +1,5 @@
 package utils.results;
 
-import utils.DataResult;
-
 public class ResultString implements DataResult<String> {
 
     private String data;

@@ -1,7 +1,5 @@
 package utils.results;
 
-import utils.DataResult;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 

@@ -1,4 +1,4 @@
-package utils;
+package utils.results;
 
 public interface DataResult<T> {
 

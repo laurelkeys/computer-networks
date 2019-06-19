@@ -1,6 +1,5 @@
 package utils.results;
 
-import utils.DataResult;
 import utils.Person;
 
 import java.util.ArrayList;
