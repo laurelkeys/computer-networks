@@ -15,6 +15,6 @@ public class ResultBoolean implements DataResult<Boolean> {
 
     @Override
     public String printable() {
-        return data.toString(); // FIXME on inherit classes
+        return data.toString();
     }
 }

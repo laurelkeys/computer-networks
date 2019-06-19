@@ -1,7 +1,6 @@
 package utils.results;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ResultStrings implements DataResult<ArrayList<String>> {
 
@@ -18,6 +17,6 @@ public class ResultStrings implements DataResult<ArrayList<String>> {
 
     @Override
     public String printable() {
-        return Arrays.toString(data.toArray()); // FIXME on inherit classes
+        return String.join("\n", data);
     }
 }

@@ -3,7 +3,6 @@ package utils.results;
 import utils.Person;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ResultProfiles implements DataResult<ArrayList<Person>> {
 
@@ -20,6 +19,10 @@ public class ResultProfiles implements DataResult<ArrayList<Person>> {
 
     @Override
     public String printable() {
-        return Arrays.toString(data.toArray()); // FIXME on inherit classes
+        ArrayList<String> printable = new ArrayList<>();
+        for (Person profile : data) {
+            printable.add(profile.toString());
+        }
+        return String.join("\n\n", printable);
     }
 }

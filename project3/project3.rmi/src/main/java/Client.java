@@ -1,15 +1,11 @@
 import utils.Constants;
 import utils.DataKeeper;
-import utils.Person;
 import utils.results.DataResult;
 
-import java.io.IOError;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static java.lang.System.*;
 
@@ -28,19 +24,22 @@ public class Client {
         out.print("(7) sair.\n\n");
     }
 
+    private static void printResult(DataResult result) {
+        out.println("--resultado-->");
+        out.println(result.printable());
+        out.println("<------------");
+    }
+
     private static void opt1() throws RemoteException {
         out.print("Digite o curso> ");
         String education = console().readLine();
-        //ArrayList<Person> results = server.getAllWithEducation(education);
-        DataResult result = server.getAllWithEducation(education);
-        out.println(result.printable());
+        printResult(server.getAllWithEducation(education));
     }
 
     private static void opt2() throws RemoteException {
         out.print("Digite a cidade> ");
         String city = console().readLine();
-        DataResult result = server.getSkills(city);
-        out.println(result.printable());
+        printResult(server.getSkills(city));
     }
 
     private static void opt3() throws RemoteException {
@@ -48,27 +47,23 @@ public class Client {
         String email = console().readLine();
         out.print("Digite a habilidade> ");
         String experience = console().readLine();
-        DataResult result = server.addExperience(email, experience);
-        out.println(result.printable());
+        printResult(server.addExperience(email, experience));
     }
 
     private static void opt4() throws RemoteException {
         out.print("Digite o email> ");
         String email = console().readLine();
-        DataResult result = server.getExperience(email);
-        out.println(result.printable());
+        printResult(server.getExperience(email));
     }
 
     private static void opt5() throws RemoteException {
-        DataResult result = server.getAllProfiles();
-        out.println(result.printable());
+        printResult(server.getAllProfiles());
     }
 
     private static void opt6() throws RemoteException {
         out.print("Digite o email> ");
         String email = console().readLine();
-        DataResult result = server.getProfile(email);
-        out.println(result.printable());
+        printResult(server.getProfile(email));
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
@@ -81,7 +76,7 @@ public class Client {
 
             try {
                 option = Integer.parseInt(console().readLine());
-            } catch (IOError e) {
+            } catch (Exception e) {
                 err.println("Input inválido");
                 continue;
             }

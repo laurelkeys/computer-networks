@@ -17,6 +17,6 @@ public class ResultProfile implements DataResult<Person> {
 
     @Override
     public String printable() {
-        return data.toString(); // FIXME on inherit classes
+        return data.toString();
     }
 }
