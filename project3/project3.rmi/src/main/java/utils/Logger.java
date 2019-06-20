@@ -47,7 +47,7 @@ public final class Logger {
         } catch (IOException e) {
             err.println("Logger exception: " + e.toString());
         }
-        out.println(log);
+        if (me.equals(ClientServer.Server)) out.println(log);
     }
 
     public static void emptyFiles() {
