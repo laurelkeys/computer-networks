@@ -1,4 +1,4 @@
-import utils.Constants;
+import utils.AddressName;
 import utils.DataKeeper;
 import utils.Logger;
 import utils.Logger.ClientServer;
@@ -11,9 +11,13 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.System.err;
 import static java.lang.System.out;
+import static utils.AddressName.address;
+import static utils.AddressName.localhost;
 import static utils.Logger.Option.*;
 import static utils.Logger.Timestamp.AfterQuery;
 import static utils.Logger.Timestamp.BeforeQuery;
@@ -47,10 +51,24 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
         insert(cinco);
     }
 
+    public static void main(String[] args) {
+        final Map<String, List<String>> params = new HashMap<>();
+        parseArgs(args, params);
+        String name = addressName(params);
+        out.println(name);
+
+        try {
+            Naming.rebind(AddressName.LOCALHOST, new Server());
+            out.println("Server ready");
+        } catch (Exception e) {
+            err.println("Server exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+
     private void insert(Person person) {
         database.put(person.getEmail(), person);
     }
-
 
     @Override
     public DataResult getAllWithEducation(String education) throws RemoteException {
@@ -114,13 +132,38 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
         return new ResultOpt6(profile);
     }
 
-    public static void main(String[] args) {
-        try {
-            Naming.rebind(Constants.ADDRESS, new Server());
-            out.println("Server ready");
-        } catch (Exception e) {
-            err.println("Server exception: " + e.toString());
-            e.printStackTrace();
+    private static String addressName(Map<String, List<String>> params) {
+        if (params.containsKey("a")) {
+            if (params.containsKey("p")) {
+                return address(params.get("a").get(0), params.get("p").get(0));
+            }
+
+            return address(params.get("a").get(0));
+        }
+
+        if (params.containsKey("p")) {
+            return localhost(params.get("p").get(0));
+        }
+
+        return AddressName.LOCALHOST;
+    }
+
+    private static void parseArgs(String[] args, Map<String, List<String>> params) {
+        List<String> options = null;
+        for (final String arg : args) {
+            if (arg.charAt(0) == '-') {
+                if (arg.length() < 2) {
+                    err.println("Error at argument " + arg);
+                    return;
+                }
+                options = new ArrayList<>();
+                params.put(arg.substring(1), options);
+            } else if (options != null) {
+                options.add(arg);
+            } else {
+                err.println("Illegal parameter usage");
+                return;
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-import utils.Constants;
+import utils.AddressName;
 import utils.DataKeeper;
 import utils.Logger;
 import utils.Logger.ClientServer;
@@ -30,7 +30,7 @@ public class Client {
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
-        server = (DataKeeper) Naming.lookup(Constants.ADDRESS);
+        server = (DataKeeper) Naming.lookup(AddressName.LOCALHOST);
 
         Logger.emptyFiles();
 
