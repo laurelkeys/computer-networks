@@ -1,5 +1,7 @@
 import utils.Constants;
 import utils.DataKeeper;
+import utils.Logger;
+import utils.Logger.ClientServer;
 import utils.results.DataResult;
 
 import java.net.MalformedURLException;
@@ -8,6 +10,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import static java.lang.System.*;
+import static utils.Logger.Option.*;
+import static utils.Logger.Timestamp.AfterResultReceived;
+import static utils.Logger.Timestamp.BeforeInputSend;
 
 public class Client {
 
@@ -24,50 +29,10 @@ public class Client {
         out.print("(7) sair.\n\n");
     }
 
-    private static void printResult(DataResult result) {
-        out.println("--resultado-->");
-        out.println(result.printable());
-        out.println("<------------");
-    }
-
-    private static void opt1() throws RemoteException {
-        out.print("Digite o curso> ");
-        String education = console().readLine();
-        printResult(server.getAllWithEducation(education));
-    }
-
-    private static void opt2() throws RemoteException {
-        out.print("Digite a cidade> ");
-        String city = console().readLine();
-        printResult(server.getSkills(city));
-    }
-
-    private static void opt3() throws RemoteException {
-        out.print("Digite o email> ");
-        String email = console().readLine();
-        out.print("Digite a habilidade> ");
-        String experience = console().readLine();
-        printResult(server.addExperience(email, experience));
-    }
-
-    private static void opt4() throws RemoteException {
-        out.print("Digite o email> ");
-        String email = console().readLine();
-        printResult(server.getExperience(email));
-    }
-
-    private static void opt5() throws RemoteException {
-        printResult(server.getAllProfiles());
-    }
-
-    private static void opt6() throws RemoteException {
-        out.print("Digite o email> ");
-        String email = console().readLine();
-        printResult(server.getProfile(email));
-    }
-
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
         server = (DataKeeper) Naming.lookup(Constants.ADDRESS);
+
+        Logger.emptyFiles();
 
         int option;
         boolean quit = false;
@@ -105,5 +70,77 @@ public class Client {
                     break;
             }
         }
+
+        atExit();
+    }
+
+    private static void atExit() {
+        // TODO
+    }
+
+    private static void printResult(DataResult result) {
+        out.println("--resultado-->");
+        out.println(result.printable());
+        out.println("<------------");
+    }
+
+    private static void opt1() throws RemoteException {
+        out.print("Digite o curso> ");
+        String education = console().readLine();
+
+        Logger.log(ClientServer.Client, Opt1, BeforeInputSend);
+        DataResult result = server.getAllWithEducation(education);
+        Logger.log(ClientServer.Client, Opt1, AfterResultReceived);
+        printResult(result);
+    }
+
+    private static void opt2() throws RemoteException {
+        out.print("Digite a cidade> ");
+        String city = console().readLine();
+
+        Logger.log(ClientServer.Client, Opt2, BeforeInputSend);
+        DataResult result = server.getSkills(city);
+        Logger.log(ClientServer.Client, Opt2, AfterResultReceived);
+        printResult(result);
+    }
+
+    private static void opt3() throws RemoteException {
+        out.print("Digite o email> ");
+        String email = console().readLine();
+        out.print("Digite a experiência> ");
+        String experience = console().readLine();
+
+        Logger.log(ClientServer.Client, Opt3, BeforeInputSend);
+        DataResult result = server.addExperience(email, experience);
+        Logger.log(ClientServer.Client, Opt3, AfterResultReceived);
+        printResult(result);
+    }
+
+    private static void opt4() throws RemoteException {
+        out.print("Digite o email> ");
+        String email = console().readLine();
+        printResult(server.getExperience(email));
+
+        Logger.log(ClientServer.Client, Opt4, BeforeInputSend);
+        DataResult result = server.getExperience(email);
+        Logger.log(ClientServer.Client, Opt4, AfterResultReceived);
+        printResult(result);
+    }
+
+    private static void opt5() throws RemoteException {
+        Logger.log(ClientServer.Client, Opt5, BeforeInputSend);
+        DataResult result = server.getAllProfiles();
+        Logger.log(ClientServer.Client, Opt5, AfterResultReceived);
+        printResult(result);
+    }
+
+    private static void opt6() throws RemoteException {
+        out.print("Digite o email> ");
+        String email = console().readLine();
+
+        Logger.log(ClientServer.Client, Opt5, BeforeInputSend);
+        DataResult result = server.getProfile(email);
+        Logger.log(ClientServer.Client, Opt5, AfterResultReceived);
+        printResult(result);
     }
 }
