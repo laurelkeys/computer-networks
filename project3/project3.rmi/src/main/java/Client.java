@@ -13,6 +13,8 @@ import static java.lang.System.*;
 import static utils.Logger.Option.*;
 import static utils.Logger.Timestamp.AfterResultReceived;
 import static utils.Logger.Timestamp.BeforeInputSend;
+import static utils.Parser.addressName;
+import static utils.Parser.parseArgs;
 
 public class Client {
 
@@ -30,7 +32,7 @@ public class Client {
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
-        server = (DataKeeper) Naming.lookup(AddressName.LOCALHOST);
+        server = (DataKeeper) Naming.lookup(addressName(parseArgs(args))); // AddressName.LOCALHOST by default
 
         Logger.emptyFiles();
 

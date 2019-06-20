@@ -7,8 +7,13 @@
 
 ### 2. Run the server:
 - Go to **project3.rmi\src\main\java** (on a new terminal window)
-- Run `java Server`
+- Run `java Server [-p PORT_NUMBER] [-a ADDRESS]`
 
 ### 3. Run the client:
 - Go to **project3.rmi\src\main\java** (on yet another terminal window)
-- Run `java Client`
+- Run `java Client [-p PORT_NUMBER] [-a ADDRESS]`
+
+### Notes:
+- Both **-p** and **-a** are optional arguments
+- If you set a **PORT_NUMBER** when running `rmiregistry` then **-p** should be passed with it
+- **ADDRESS** is **localhost** by default

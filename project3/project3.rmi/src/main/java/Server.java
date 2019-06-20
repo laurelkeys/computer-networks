@@ -1,4 +1,3 @@
-import utils.AddressName;
 import utils.DataKeeper;
 import utils.Logger;
 import utils.Logger.ClientServer;
@@ -11,16 +10,14 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static java.lang.System.err;
 import static java.lang.System.out;
-import static utils.AddressName.address;
-import static utils.AddressName.localhost;
 import static utils.Logger.Option.*;
 import static utils.Logger.Timestamp.AfterQuery;
 import static utils.Logger.Timestamp.BeforeQuery;
+import static utils.Parser.addressName;
+import static utils.Parser.parseArgs;
 
 public class Server extends UnicastRemoteObject implements DataKeeper {
 
@@ -31,6 +28,18 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
     private Server() throws RemoteException {
         super();
         initDB();
+    }
+
+    public static void main(String[] args) {
+        String name = addressName(parseArgs(args)); // AddressName.LOCALHOST by default
+        out.println(name);
+        try {
+            Naming.rebind(name, new Server());
+            out.println("Server ready");
+        } catch (Exception e) {
+            err.println("Server exception: " + e.toString());
+            e.printStackTrace();
+        }
     }
 
     private void initDB() {
@@ -49,21 +58,6 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
         insert(uno);
         insert(tres);
         insert(cinco);
-    }
-
-    public static void main(String[] args) {
-        final Map<String, List<String>> params = new HashMap<>();
-        parseArgs(args, params);
-        String name = addressName(params);
-        out.println(name);
-
-        try {
-            Naming.rebind(AddressName.LOCALHOST, new Server());
-            out.println("Server ready");
-        } catch (Exception e) {
-            err.println("Server exception: " + e.toString());
-            e.printStackTrace();
-        }
     }
 
     private void insert(Person person) {
@@ -102,7 +96,7 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
         Person person = database.get(email);
         if (person != null) {
             person.addExperience(experience);
-            return new ResultOpt3(true); // TODO check that the experience has been added
+            return new ResultOpt3(true);
         }
         Logger.log(ClientServer.Server, Opt3, AfterQuery);
         return new ResultOpt3(false);
@@ -130,40 +124,5 @@ public class Server extends UnicastRemoteObject implements DataKeeper {
         Person profile = database.get(email);
         Logger.log(ClientServer.Server, Opt6, AfterQuery);
         return new ResultOpt6(profile);
-    }
-
-    private static String addressName(Map<String, List<String>> params) {
-        if (params.containsKey("a")) {
-            if (params.containsKey("p")) {
-                return address(params.get("a").get(0), params.get("p").get(0));
-            }
-
-            return address(params.get("a").get(0));
-        }
-
-        if (params.containsKey("p")) {
-            return localhost(params.get("p").get(0));
-        }
-
-        return AddressName.LOCALHOST;
-    }
-
-    private static void parseArgs(String[] args, Map<String, List<String>> params) {
-        List<String> options = null;
-        for (final String arg : args) {
-            if (arg.charAt(0) == '-') {
-                if (arg.length() < 2) {
-                    err.println("Error at argument " + arg);
-                    return;
-                }
-                options = new ArrayList<>();
-                params.put(arg.substring(1), options);
-            } else if (options != null) {
-                options.add(arg);
-            } else {
-                err.println("Illegal parameter usage");
-                return;
-            }
-        }
     }
 }
