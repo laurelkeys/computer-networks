@@ -1,8 +1,7 @@
-import utils.AddressName;
 import utils.DataKeeper;
 import utils.Logger;
 import utils.Logger.ClientServer;
-import utils.results.DataResult;
+import utils.DataResult;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;

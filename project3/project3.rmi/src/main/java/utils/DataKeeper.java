@@ -1,7 +1,5 @@
 package utils;
 
-import utils.results.DataResult;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 

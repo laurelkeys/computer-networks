@@ -1,4 +1,4 @@
-package utils.results;
+package utils;
 
 import java.io.Serializable;
 

@@ -1,5 +1,7 @@
 package utils.results;
 
+import utils.DataResult;
+
 public class ResultBoolean implements DataResult<Boolean> {
 
     private Boolean data;

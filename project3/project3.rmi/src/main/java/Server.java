@@ -2,7 +2,7 @@ import utils.DataKeeper;
 import utils.Logger;
 import utils.Logger.ClientServer;
 import utils.Person;
-import utils.results.DataResult;
+import utils.DataResult;
 import utils.results.options.*;
 
 import java.rmi.Naming;

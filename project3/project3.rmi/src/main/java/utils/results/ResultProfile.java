@@ -1,5 +1,6 @@
 package utils.results;
 
+import utils.DataResult;
 import utils.Person;
 
 public class ResultProfile implements DataResult<Person> {

@@ -1,5 +1,7 @@
 package utils.results;
 
+import utils.DataResult;
+
 import java.util.ArrayList;
 
 public class ResultStrings implements DataResult<ArrayList<String>> {

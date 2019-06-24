@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-sh clean.sh
+sh ./clean.sh
 javac -source 8 -target 8 utils/DataKeeper.java Client.java Server.java
 echo "Usage:"
 echo " 1. Start a remote object registry:"
