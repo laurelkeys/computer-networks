@@ -1,21 +1,23 @@
 import utils.DataKeeper;
+import utils.DataResult;
 import utils.Logger;
 import utils.Logger.ClientServer;
-import utils.DataResult;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import static java.lang.System.*;
+import static java.lang.System.err;
+import static java.lang.System.out;
 import static utils.Logger.Option.*;
 import static utils.Logger.Timestamp.AfterResultReceived;
 import static utils.Logger.Timestamp.BeforeInputSend;
 import static utils.Parser.addressName;
 import static utils.Parser.parseArgs;
-
-import java.io.*;   
 
 public class Client {
 
@@ -37,7 +39,7 @@ public class Client {
         server = (DataKeeper) Naming.lookup(addressName(parseArgs(args))); // AddressName.LOCALHOST by default
 
         Logger.emptyFiles();
-        reader = new BufferedReader(new InputStreamReader(System.in));   
+        reader = new BufferedReader(new InputStreamReader(System.in));
 
         int option;
         boolean quit = false;
@@ -45,48 +47,24 @@ public class Client {
             printMenu();
 
             try {
-				//con = console().readLine();
-                //System.out.println("console:"+con);
-                //str = reader.readLine();
                 option = Integer.parseInt(reader.readLine());
-				//System.out.println("input"+option);
             } catch (Exception e) {
-				//System.out.println("input"+option);
-				//System.out.println("console:"+con);
                 err.println("Input inválido");
                 continue;
             }
 
             switch (option) {
-                case 1:
-                    opt1();
-                    break;
-                case 2:
-                    opt2();
-                    break;
-                case 3:
-                    opt3();
-                    break;
-                case 4:
-                    opt4();
-                    break;
-                case 5:
-                    opt5();
-                    break;
-                case 6:
-                    opt6();
-                    break;
+                case 1: opt1(); break;
+                case 2: opt2(); break;
+                case 3: opt3(); break;
+                case 4: opt4(); break;
+                case 5: opt5(); break;
+                case 6: opt6(); break;
                 default:
                     quit = true;
                     break;
             }
         }
-
-        atExit();
-    }
-
-    private static void atExit() {
-        // TODO
     }
 
     private static void printResult(DataResult result) {
@@ -98,7 +76,7 @@ public class Client {
     private static void opt1() throws RemoteException, IOException {
         out.print("Digite o curso> ");
         String education = reader.readLine();
-        out.print("Curso selecionado:"+education);
+        out.print("Curso selecionado:" + education);
 
         Logger.log(ClientServer.Client, Opt1, BeforeInputSend);
         DataResult result = server.getAllWithEducation(education);
