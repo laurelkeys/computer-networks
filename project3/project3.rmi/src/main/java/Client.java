@@ -109,7 +109,6 @@ public class Client {
     private static void opt4() throws RemoteException, IOException {
         out.print("Digite o email> ");
         String email = reader.readLine();
-        printResult(server.getExperience(email));
 
         Logger.log(ClientServer.Client, Opt4, BeforeInputSend);
         DataResult result = server.getExperience(email);

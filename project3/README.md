@@ -17,3 +17,4 @@
 - Both **-p** and **-a** are optional arguments
 - If you set a **PORT_NUMBER** when running `rmiregistry` then **-p** should be passed with it
 - **ADDRESS** is **localhost** by default
+- You should wait a few seconds after running **rmiregistry** before starting the server, or it may raise a ConnectException
